@@ -9,7 +9,7 @@ read nc1
 # echo Nombre del .nc 2
 # read nc2
 
-cat << EOF > trajio.cpptraj
+cat << EOF > trajio.in
 parm ${prmtop}.prmtop
 trajin ${nc1}.nc 1 last 10
 autoimage
@@ -21,7 +21,7 @@ go
 
 EOF
 
-cat << EOF > dry.cpptraj
+cat << EOF > dry.in
 parm ${prmtop}.prmtop
 parmstrip :Na+
 parmstrip :Cl-
@@ -31,9 +31,7 @@ go
 
 EOF
 
-cpptraj -i trajio.cpptraj
-cpptraj -i dry.cpptraj
-
-# rm trajio.cpptraj ${nc1}.nc dry.cpptraj
+cpptraj -i trajio.in
+cpptraj -i dry.in
 
 vmd ${prmtop}_dry.prmtop ${nc1}_dry.nc
