@@ -15,4 +15,4 @@ H2O_s = int(input("Ingrese la cantidad de moléculas de agua en la simulación:\
 
 ion_s = ion_L * H2O_s / H2O_L  # Simple regla de tres
 
-print(f"Deben agregarse {ion_s:.0f} átomos de cada ion.")
+print(f"Deben agregarse {ion_s:.0f} unidades de cada ion.")
