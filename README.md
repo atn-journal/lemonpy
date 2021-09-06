@@ -21,5 +21,8 @@ Procesa el archivo de topología para eliminar agua e iones.
 [join-traj](join-traj.sh)  
 Une trayectorias.
 
+[fas2pir](fas2pir.sh)
+Convierte una secuencia FASTA a formato PIR.
+
 [MutSeq](MutSeq.py)  
 Solicita ingreso de una secuencia aminoacídica, posición a mutar y aa nuevo. Se pueden ingresar varias posiciones individuales. Da como salida las secuencias mutadas en formato FASTA.  
