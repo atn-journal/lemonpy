@@ -12,7 +12,7 @@ Realiza la minimización energética en tres pasos de un sistema solvatado. Mues
 [template.slurm](template.slurm)  
 Plantilla para correr MD con script de SLURM.
 
-[strip-traj](process-cpptraj.sh)  
+[strip-traj](strip-traj.sh)  
 Procesa una trayectoria .nc eliminando una de cada diez frames. Centra la proteína en la caja y remueve aguas e iones.
 
 [strip-prmtop](strip-prmtop.sh)  
