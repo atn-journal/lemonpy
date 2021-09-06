@@ -5,10 +5,10 @@ from modeller import *
 env = Environ()
 aln = Alignment(env)
 
-template = input("Ingrese el nombre de archivo del template (*.pdb):\n")
+template = 'template.pdb'               #
 template_base = template[0:-4]
 
-seq = input("Ingrese el nombre de archivo de la secuencia a modelar en formato PIR (*.ali):\n")
+seq = 'sequence.ali'                    #
 seq_base = seq[0:-4]
 
 seq_temp = "-".join([seq_base, template_base])
