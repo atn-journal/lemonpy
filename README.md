@@ -1,13 +1,13 @@
 # lemonpy
 
 [addionsrand](addionsrand.py)  
-Calcula cuántos iones agregar a un sistema solvatado en función de el número de moléculas de agua presentes y la molaridad deseada.  
+Calcula cuántos iones agregar a un sistema solvatado en función del número de moléculas de agua presentes y la molaridad deseada.  
 
 [MDsteps](MDsteps.py)  
 Calcula cuántos steps deben solicitarse para realizar una dinámica de X ns, dado un step de Y fs.
 
 [minimize](minimize.sh)  
-Realiza la minimización energética en tres pasos de un sistema solvatado.
+Realiza la minimización energética en tres pasos de un sistema solvatado. Muestra los resultados en VMD.
 
 [MutSeq](MutSeq.py)  
 Solicita ingreso de una secuencia aminoacídica, posición a mutar y aa nuevo. Se pueden ingresar varias posiciones individuales. Da como salida las secuencias mutadas en formato FASTA.  
