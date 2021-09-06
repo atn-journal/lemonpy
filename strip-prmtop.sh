@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-# Usage: ./strip-prmtop.sh -p {basename_of_prmtop}
+# Usage: ./strip-prmtop.sh -p {prmtop}
 
 while getopts :p: flag
 do
     case "${flag}" in
-        p) prmtop=${OPTARG};;
+        p) prmtop=$(basename ${OPTARG} .prmtop);;
     esac
 done
 

@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
-# Usage: ./strip-traj.sh -p {basename_of_prmtop} -t {basename_of_trajectory}
+# Usage: ./strip-traj.sh -p {prmtop} -t {trajectory}
 
 while getopts :p:t: flag
 do
     case "${flag}" in
-        p) prmtop=${OPTARG};;
-        t) nc1=${OPTARG};;
+        p) prmtop=$(basename ${OPTARG} .prmtop);;
+        t) nc1=$(basename ${OPTARG} .nc);;
     esac
 done
 

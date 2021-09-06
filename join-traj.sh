@@ -1,21 +1,21 @@
 #!/usr/bin/env bash
 
-# Usage: ./join-traj.sh -p {basename_of_prmtop} -t {basename_of_first_trajectory} -j {basename_of_trajectory_to_add}
+# Usage: ./join-traj.sh -p {prmtop} -t {first_trajectory} -j {trajectory_to_add}
 
 while getopts :p:t:j: flag
 do
     case "${flag}" in
-        p) prmtop=${OPTARG}
+        p) prmtop=$(basename ${OPTARG} .prmtop)
 cat << EOF > join.in
 parm ${prmtop}.prmtop
 EOF
 ;;
-        t) nc1=${OPTARG}
+        t) nc1=$(basename ${OPTARG} .nc)
 cat << EOF >> join.in
 trajin ${nc1}.nc
 EOF
 ;;
-        j) nc2=${OPTARG}
+        j) nc2=$(basename ${OPTARG} .nc)
 cat << EOF >> join.in
 trajin ${nc2}.nc
 EOF
