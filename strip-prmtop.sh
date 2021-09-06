@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage: ./strip-prmtop.sh -p {basename of prmtop}
+# Usage: ./strip-prmtop.sh -p {basename_of_prmtop}
 
 while getopts :p: flag
 do

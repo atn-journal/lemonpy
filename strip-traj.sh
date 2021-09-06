@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage: ./strip-traj.sh -p {basename of prmtop} -t {basename of trajectory}
+# Usage: ./strip-traj.sh -p {basename_of_prmtop} -t {basename_of_trajectory}
 
 while getopts :p:t: flag
 do

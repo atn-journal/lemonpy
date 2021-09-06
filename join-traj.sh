@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage: ./join-traj.sh -p {basename of prmtop} -t {basename of first trajectory} -j {basename of trajectory to add}
+# Usage: ./join-traj.sh -p {basename_of_prmtop} -t {basename_of_first_trajectory} -j {basename_of_trajectory_to_add}
 
 while getopts :p:t:j: flag
 do
