@@ -4,6 +4,8 @@
 # https://www.researchgate.net/post/How_can_I_Convert_Fasta_format_or_aln_format_to_PIR_format_I_need_this_for_modeller_but_clustal_W_doesnt_have_this_option
 # 19th Jan, 2016 / Kirill E Medvedev, University of Texas Southwestern Medical Center
 
+# Usage: ./fas2pir.sh sequence.fasta
+
 name=$(basename $1 .fasta)
 
 cp $name.fasta $name.sequence # copy your fasta to a new file
