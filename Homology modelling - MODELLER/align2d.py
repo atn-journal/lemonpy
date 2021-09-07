@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# For alignment of sequence-structure using one template. For multiple templates go for align2d_mult.py
+# Usage: change template and sequence names and execute as ./align2d.py
+
 from modeller import *
 
 env = Environ()
