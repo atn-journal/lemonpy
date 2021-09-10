@@ -1,14 +1,18 @@
 #!/bin/bash
 #SBATCH --job-name=MD                             #
+#SBATCH --time=100:00:00                          #
+#SBATCH --tmp=50G                                 #
+#SBATCH --mail-user=a@gmail.com                   #
+##SBATCH --dependency=afterok:JOBID                #
 #SBATCH --partition=normal
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
-#SBATCH --time=55:00:00                           #
-#SBATCH --tmp=50G                                 #
 #SBATCH --mail-type=BEGIN,END,FAIL
-#SBATCH --mail-user=a@b.com                       #
+#SBATCH --output=%j.log
+
+echo $SLURM_JOB_ID; hostname; date
 
 # Load modules
 source /etc/profile.d/modules.sh
@@ -17,23 +21,23 @@ source /etc/profile.d/modules.sh
 module use /clusteruy/home03/biosim_ip/modulefiles
 module load amber18-tools19
 
+# Define names
+top='basename_of_prmtop'                   #
+inp='basename_of_input_coord'              #
+out='basename_of_output_trajectory'        #
+
 # Move files to scratch
 mkdir /scratch/$USER/$SLURM_JOB_ID
-cp ~/path/to/archivos /scratch/$USER/$SLURM_JOBID/     #
+cp ~/JOBID/${inp}/{md.in,${top}.prmtop,${inp}.rst,strip-traj.sh} /scratch/$USER/$SLURM_JOBID/     #
 cd /scratch/$USER/$SLURM_JOB_ID
 
-# Define names
-top='basename_of_prmtop'            #
-crd='filename_of_coord'             #
-trj='basename_of_trajectory'        #
-
 # RUN MD
-pmemd.cuda -O -i md.in -o md.out -p ${top}.prmtop -c ${crd} -r ${trj}.rst -x ${trj}.nc
+pmemd.cuda -O -i md.in -o ${out}.out -p ${top}.prmtop -c ${inp}.rst -r ${out}.rst -x ${out}.nc  # Beware that first MD run uses coordinates with .inpcrd extension
 
 # Reduce trajectory filesize
-./strip-traj.sh -p ${top} -t ${trj}
+./strip-traj.sh -p ${top}.prmtop -t ${out}.nc
 
 # Recover files and remove from scratch
-mkdir ~/$SLURM_JOB_ID
-cp /scratch/$USER/$SLURM_JOB_ID/* ~/$SLURM_JOB_ID
+mkdir -p ~/$SLURM_JOB_ID/${out}
+cp /scratch/$USER/$SLURM_JOB_ID/* ~/$SLURM_JOB_ID/${out}
 rm -rf /scratch/$USER/$SLURM_JOB_ID
