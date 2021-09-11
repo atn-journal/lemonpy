@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-echo Número de residuos de la proteína:
+echo 'Number of residues in protein'
 read res
 
 cat << EOF > min1.in
@@ -87,21 +87,14 @@ conjugated gradient
 
 EOF
 
-echo Nombre del .prmtop:
-read prmtop
+echo 'Filename of topology file (.prmtop)'
+read topology
+prmtop=$(basename ${topology} .prmtop)
 
-# cat << EOF > rst2pdb.in
-# parm ${prmtop}.prmtop
-# trajin ${prmtop}_min.rst
-# trajout ${prmtop}_min.pdb pdb
-# go
-# 
-# EOF
+pmemd.cuda -O -i min1.in -o ${prmtop}_min1.out -p ${prmtop}.prmtop -c ${prmtop}.inpcrd -r ${prmtop}_min1.rst -ref ${prmtop}.inpcrd
+pmemd.cuda -O -i min2.in -o ${prmtop}_min2.out -p ${prmtop}.prmtop -c ${prmtop}_min1.rst -r ${prmtop}_min2.rst -ref ${prmtop}.inpcrd
+pmemd.cuda -O -i min3.in -o ${prmtop}_min3.out -p ${prmtop}.prmtop -c ${prmtop}_min2.rst -r ${prmtop}_min3.rst -ref ${prmtop}.inpcrd
 
-pmemd -O -i min1.in -o min1.out -p ${prmtop}.prmtop -c ${prmtop}.inpcrd -r min1.rst -ref ${prmtop}.inpcrd
-pmemd -O -i min2.in -o min2.out -p ${prmtop}.prmtop -c min1.rst -r min2.rst -ref ${prmtop}.inpcrd
-pmemd -O -i min3.in -o min3.out -p ${prmtop}.prmtop -c min2.rst -r ${prmtop}_min.rst -ref ${prmtop}.inpcrd
+echo "Minimization took ${SECONDS} s."
 
-echo La minimización demoró $(($SECONDS/60)) minutos.
-
-vmd ${prmtop}_min.pdb -netcdf min1.rst -netcdf min2.rst -netcdf ${prmtop}_min.rst
+vmd ${prmtop}.prmtop -netcdf ${prmtop}_min1.rst -netcdf ${prmtop}_min2.rst -netcdf ${prmtop}_min3.rst
