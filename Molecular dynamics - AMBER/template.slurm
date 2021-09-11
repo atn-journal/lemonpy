@@ -20,17 +20,17 @@ source /etc/profile.d/modules.sh
 module use /clusteruy/home03/biosim_ip/modulefiles
 module load amber18-tools19
 
-# Define names
-top='basename_of_prmtop'
-inp='basename_of_input_coord'
-out='basename_of_output_trajectory'
+# Define basenames
+top='prmtop'
+inp='rst'
+out='trajectory'
 folder='folder'
-dependency='previous_job_ID'
+#dependency='jobID'
 
 # Move files to scratch
 echo "####################";Moving files to scratch
 mkdir -p /scratch/$USER/$SLURM_JOB_ID
-#cp ~/${folder}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
+cp ~/${folder}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
 #cp ~/${folder}/${dependency}/${inp}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
 cd /scratch/$USER/$SLURM_JOB_ID
 
@@ -54,7 +54,7 @@ rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 
 # Define names
 inp=$out
-out='basename_of_output_trajectory'
+out='trajectory'
 
 # Move files to scratch
 echo "####################";date;Moving files to scratch
