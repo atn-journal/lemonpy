@@ -11,7 +11,7 @@
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=BEGIN,END,FAIL
 
-echo $SLURM_JOB_ID; hostname; date
+echo $SLURM_JOB_ID; hostname;
 
 # Load modules
 source /etc/profile.d/modules.sh
@@ -24,28 +24,30 @@ module load amber18-tools19
 top='basename_of_prmtop'
 inp='basename_of_input_coord'
 out='basename_of_output_trajectory'
+folder='folder'
+dependency='previous_job_ID'
 
 # Move files to scratch
-echo Moving files to scratch; date
+echo "####################";Moving files to scratch
 mkdir -p /scratch/$USER/$SLURM_JOB_ID
-#cp ~/PATH/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
-#cp ~/JOBID/${inp}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
+#cp ~/${folder}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
+#cp ~/${folder}/${dependency}/${inp}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
 cd /scratch/$USER/$SLURM_JOB_ID
 
 # RUN MD
-echo Runnning first MD; date
+echo "####################";date;Runnning first MD
 pmemd.cuda -O -i md.in -o ${out}.out -p ${top}.prmtop -c ${inp}.rst -r ${out}.rst -x ${out}.nc
 
 # Process trajectory
-echo Processing first MD; date
+echo "####################";date;Processing first MD
 strip-traj.sh -p ${top}.prmtop -t ${out}.nc
 analyze-traj.sh -p ${top}.prmtop -t ${out}_dry.nc
 reduce-traj.sh -p ${top}.prmtop -t ${out}_dry.nc
 
 # Recover files and remove from scratch
-echo Recovering data from scratch; date
-mkdir -p ~/$SLURM_JOB_ID/${out}
-cp /scratch/$USER/$SLURM_JOB_ID/* ~/$SLURM_JOB_ID/${out}
+echo "####################";date;Recovering data from scratch
+mkdir -p ~/$folder/$SLURM_JOB_ID/${out}
+cp /scratch/$USER/$SLURM_JOB_ID/* ~/$folder/$SLURM_JOB_ID/${out}
 rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 
 
@@ -55,21 +57,21 @@ inp=$out
 out='basename_of_output_trajectory'
 
 # Move files to scratch
-echo Moving files to scratch; date
-cp ~/$SLURM_JOB_ID/${inp}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
+echo "####################";date;Moving files to scratch
+cp ~/$folder/$SLURM_JOB_ID/${inp}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
 
 # RUN MD
-echo Runnning second MD; date
+echo "####################";date;Runnning second MD
 pmemd.cuda -O -i md.in -o ${out}.out -p ${top}.prmtop -c ${inp}.rst -r ${out}.rst -x ${out}.nc
 
 # Process trajectory
-echo Processing second MD; date
+echo "####################";date;Processing second MD
 strip-traj.sh -p ${top}.prmtop -t ${out}.nc
 analyze-traj.sh -p ${top}.prmtop -t ${out}_dry.nc
 reduce-traj.sh -p ${top}.prmtop -t ${out}_dry.nc
 
 # Recover files and remove from scratch
-echo Recovering data from scratch; date
-mkdir -p ~/$SLURM_JOB_ID/${out}
-cp /scratch/$USER/$SLURM_JOB_ID/* ~/$SLURM_JOB_ID/${out}
+echo "####################";date;Recovering data from scratch
+mkdir -p ~/$folder/$SLURM_JOB_ID/${out}
+cp /scratch/$USER/$SLURM_JOB_ID/* ~/$folder/$SLURM_JOB_ID/${out}
 rm -rf /scratch/$USER/$SLURM_JOB_ID
