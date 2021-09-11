@@ -13,7 +13,7 @@ done
 cat << EOF > reduce.in
 parm ${prmtop}.prmtop
 trajin ${nc}.nc 1 last 10
-trajout ${nc1}_small.nc netcdf
+trajout ${nc}_small.nc netcdf
 go
 
 EOF

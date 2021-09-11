@@ -17,7 +17,7 @@ autoimage
 strip :Na+
 strip :Cl-
 strip :WAT
-trajout ${nc1}_dry.nc netcdf
+trajout ${nc}_dry.nc netcdf
 go
 
 EOF
