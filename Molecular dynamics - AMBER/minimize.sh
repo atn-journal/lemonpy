@@ -1,8 +1,17 @@
 #!/usr/bin/env bash
 
-echo 'Number of residues in protein'
-read res
+# Usage: ./minimize.sh -p {prmtop} -r {residues}
 
+# Get topology and number of residues
+while getopts :p:r: flag
+do
+    case "${flag}" in
+        p) prmtop=$(basename ${OPTARG} .prmtop);;
+        r) res=${OPTARG};;
+    esac
+done
+
+# Create minimization input files
 cat << EOF > min1.in
 Minimizing the system 
 with 25 kcal/mol restraints 
@@ -87,14 +96,18 @@ conjugated gradient
 
 EOF
 
-echo 'Filename of topology file (.prmtop)'
-read topology
-prmtop=$(basename ${topology} .prmtop)
+# Redirect stdout and stderr to log
+exec > >(tee minimize.log) 2>&1
 
+echo topology=$prmtop
+echo residues=$res
+
+# Run minimization
 pmemd.cuda -O -i min1.in -o ${prmtop}_min1.out -p ${prmtop}.prmtop -c ${prmtop}.inpcrd -r ${prmtop}_min1.rst -ref ${prmtop}.inpcrd -inf ${prmtop}_min1.mdinfo
 pmemd.cuda -O -i min2.in -o ${prmtop}_min2.out -p ${prmtop}.prmtop -c ${prmtop}_min1.rst -r ${prmtop}_min2.rst -ref ${prmtop}.inpcrd -inf ${prmtop}_min2.mdinfo
 pmemd.cuda -O -i min3.in -o ${prmtop}_min3.out -p ${prmtop}.prmtop -c ${prmtop}_min2.rst -r ${prmtop}_min3.rst -ref ${prmtop}.inpcrd -inf ${prmtop}_min3.mdinfo
 
 echo -e "\n##################################################";echo "Minimization took ${SECONDS} s"; echo -e "##################################################\n"
 
+#Display results in VMD
 vmd ${prmtop}.prmtop -netcdf ${prmtop}_min1.rst -netcdf ${prmtop}_min2.rst -netcdf ${prmtop}_min3.rst

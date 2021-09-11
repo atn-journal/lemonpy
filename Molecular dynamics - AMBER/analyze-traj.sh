@@ -2,6 +2,7 @@
 
 # Usage: ./analyze-traj.sh -p {prmtop} -t {trajectory} -r {residues}
 
+# Get topology, trajectory and number of residues
 while getopts :p:t: flag
 do
     case "${flag}" in
@@ -11,6 +12,7 @@ do
     esac
 done
 
+# Write out script for analysis
 cat << EOF > analyze.in
 parm ${prmtop}.prmtop
 trajin ${nc}.nc
@@ -21,4 +23,12 @@ go
 
 EOF
 
+# Redirect stdout and stderr to log
+exec > >(tee analyze.log) 2>&1
+
+echo topology=$prmtop
+echo trajectory=$nc
+echo residues=$res
+
+# Run analysis
 cpptraj -i analyze.in

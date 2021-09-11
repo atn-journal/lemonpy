@@ -2,6 +2,7 @@
 
 # Usage: ./join-traj.sh -p {prmtop} -t {first_trajectory} -j {trajectory_to_add}
 
+# Get topology and trajectories to join
 while getopts :p:t:j: flag
 do
     case "${flag}" in
@@ -23,10 +24,19 @@ EOF
     esac
 done
 
+# Write out script to join trajectories
 cat << EOF >> join.in
 trajout ${nc2}_join.nc netcdf
 go
     
 EOF
 
+# Redirect stdout and stderr to log
+exec > >(tee join.log) 2>&1
+
+echo topology=$prmtop
+echo first trajectory=$nc1
+echo second trajectory=$nc2
+
+# Join trajectories
 cpptraj -i join.in

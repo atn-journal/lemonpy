@@ -2,6 +2,7 @@
 
 # Usage: ./strip-traj.sh -p {prmtop} -t {trajectory}
 
+# Get topology and trajectory
 while getopts :p:t: flag
 do
     case "${flag}" in
@@ -10,6 +11,7 @@ do
     esac
 done
 
+# Write out script to strip trajectory
 cat << EOF > strip-traj.in
 parm ${prmtop}.prmtop
 trajin ${nc}.nc
@@ -22,4 +24,11 @@ go
 
 EOF
 
+# Redirect stdout and stderr to log
+exec > >(tee strip-traj.log) 2>&1
+
+echo topology=$prmtop
+echo trajectory=$nc
+
+# Strip trajectory
 cpptraj -i strip-traj.in

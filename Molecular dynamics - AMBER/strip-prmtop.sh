@@ -2,6 +2,7 @@
 
 # Usage: ./strip-prmtop.sh -p {prmtop}
 
+# Get topology
 while getopts :p: flag
 do
     case "${flag}" in
@@ -9,6 +10,7 @@ do
     esac
 done
 
+# Write out script to strip topology file
 cat << EOF > strip-prmtop.in
 parm ${prmtop}.prmtop
 parmstrip :Na+
@@ -19,4 +21,10 @@ go
 
 EOF
 
+# Redirect stdout and stderr to log
+exec > >(tee strip-prmtop.log) 2>&1
+
+echo topology=$prmtop
+
+# Strip topology file
 cpptraj -i strip-prmtop.in
