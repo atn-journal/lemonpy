@@ -9,7 +9,7 @@
 #SBATCH --ntasks=1
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
-#SBATCH --mail-type=BEGIN,END,FAIL
+#SBATCH --mail-type=BEGIN,FAIL
 
 echo $SLURM_JOB_ID
 hostname
@@ -65,6 +65,8 @@ mkdir -p ~/$folder/$SLURM_JOB_ID/${out}
 cp /scratch/$USER/$SLURM_JOB_ID/* ~/$folder/$SLURM_JOB_ID/${out}
 rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 
+# Send email
+echo -e "Subject: Run $out finished in ClusterUY" | sendmail a@gmail.com
 
 
 # Define names
@@ -98,3 +100,6 @@ echo -e "##################################################\n"
 mkdir -p ~/$folder/$SLURM_JOB_ID/${out}
 cp /scratch/$USER/$SLURM_JOB_ID/* ~/$folder/$SLURM_JOB_ID/${out}
 rm -rf /scratch/$USER/$SLURM_JOB_ID
+
+# Send email
+echo -e "Subject: Run $out finished in ClusterUY" | sendmail a@gmail.com
