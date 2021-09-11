@@ -6,20 +6,20 @@ while getopts :p:t: flag
 do
     case "${flag}" in
         p) prmtop=$(basename ${OPTARG} .prmtop);;
-        t) nc1=$(basename ${OPTARG} .nc);;
+        t) nc=$(basename ${OPTARG} .nc);;
     esac
 done
 
-cat << EOF > trajio.in
+cat << EOF > strip-traj.in
 parm ${prmtop}.prmtop
-trajin ${nc1}.nc 1 last 10
+trajin ${nc}.nc
 autoimage
 strip :Na+
 strip :Cl-
 strip :WAT
 trajout ${nc1}_dry.nc netcdf
 go
-    
+
 EOF
 
-cpptraj -i trajio.in
+cpptraj -i strip-traj.in

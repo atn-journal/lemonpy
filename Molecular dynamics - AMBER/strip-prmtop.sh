@@ -9,7 +9,7 @@ do
     esac
 done
 
-cat << EOF > dry.in
+cat << EOF > strip-prmtop.in
 parm ${prmtop}.prmtop
 parmstrip :Na+
 parmstrip :Cl-
@@ -19,4 +19,4 @@ go
 
 EOF
 
-cpptraj -i dry.in
+cpptraj -i strip-prmtop.in
