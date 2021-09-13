@@ -7,13 +7,16 @@ exec > >(tee runMD.log) 2>&1
 
 # Define basenames
 prmtop='prmtop'
-echo topology=$prmtop
 inp='rst'
-echo input coordinates=$inp
 out='trajectory'
-echo output trajectory=$out
 res='residues'
+
+echo topology=$prmtop
+echo input coordinates=$inp
+echo output trajectory=$out
 echo residues=$res
+
+echo -e "\n##################################################";echo "Running $out"; echo -e "##################################################\n"
 
 # RUN MD
 time pmemd.cuda -O -i md.in -o $out.out -p $prmtop.prmtop -c $inp.rst -r $out.rst -x $out.nc -inf $out.mdinfo
@@ -26,12 +29,16 @@ reduce-traj.sh -p ${prmtop}_dry.prmtop -t ${out}_dry.nc
 
 send-email.py "Terminó la corrida $out en MicroMol"
 
+echo -e "\n##################################################";echo "MD $out finished"; echo -e "##################################################\n"
 
 # Define names
 inp=$out
-echo input coordinates=$out
 out='trajectory'
+
+echo input coordinates=$out
 echo output trajectory=$out
+
+echo -e "\n##################################################";echo "Running $out"; echo -e "##################################################\n"
 
 # RUN MD
 time pmemd.cuda -O -i md.in -o $out.out -p $prmtop.prmtop -c $inp.rst -r $out.rst -x $out.nc -inf $out.mdinfo
@@ -43,3 +50,5 @@ analyze-traj.sh -p ${prmtop}_dry.prmtop -t ${out}_dry.nc -r $res
 reduce-traj.sh -p ${prmtop}_dry.prmtop -t ${out}_dry.nc
 
 send-email.py "Terminó la corrida $out en MicroMol"
+
+echo -e "\n##################################################";echo "MD $out finished"; echo -e "##################################################\n"
