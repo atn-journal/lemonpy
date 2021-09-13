@@ -15,7 +15,7 @@ Equilibrating the system during 5000 ps at constant T = 300 K, P = 1 ATM and cou
     nstlim=250000,
 
 ##### Reference temperature at which the system is to be kept (default=300.0)
-    temp0=300.0
+    temp0=300.0,
 ##### Temperature scaling. Read documentation for details.
     # 0=microcanonical ensemble
     # 1=weak-coupling ensemble
@@ -26,11 +26,11 @@ Equilibrating the system during 5000 ps at constant T = 300 K, P = 1 ATM and cou
     tautp=0.2,
 
 ##### Pressure in bar at which the system is maintained (default=1.0)
-    pres0=1.0
+    pres0=1.0,
     # Pressure scaling: no scaling (0, default), isotropic position scaling (1).
     ntp=1,
 ##### Berendsen (1, default) or Monte Carlo barostat (2). Better performance with barostat=2 in NPT ensemble.
-    barostat=1
+    barostat=1,
 ##### Pressure relaxation time in ps. Recommended between 1.0 and 5.0.
     taup=0.2,
 
