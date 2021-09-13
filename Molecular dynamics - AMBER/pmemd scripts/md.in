@@ -1,0 +1,65 @@
+# Arbitrary number of comments.
+Molecular dynamics production of 50 ns
+  # " &cntrl" starts namelist block and is always required. The first character on each line of a namelist block must be a blank.
+  &cntrl
+    # Read only coordinates (1, default) or coord. and velocities (5) from inpcrd file.
+    ntx=5,
+    # Resume (1) or not (0, default) a previous simulation. If set to 0, time is set to 0 and velocities in inpcrd are ignored.
+    irest=1,
+
+    # Starting time in ps (default=0.0)
+    t=0.0,
+##### Time step in ps. 0.004 with HMR and SHAKE, 0.002 with SHAKE, 0.001 otherwise (default=0.001). It should be reduced for T > 300 K.
+    dt=0.002,
+    # Number of MD-steps to perform (default=1).
+    nstlim=25000000,
+
+    # Pressure in bar at which the system is maintained (default=1.0)
+    pres0=1.0
+    # Pressure scaling: no scaling (0, default), isotropic position scaling (1).
+    ntp=1,
+##### Berendsen (1, default) or Monte Carlo barostat (2). Better performance with barostat=2 in NPT ensemble.
+    barostat=1
+##### Pressure relaxation time in ps. Recommended between 1.0 and 5.0.
+    taup=5.0,
+
+##### Temperature scaling. Read documentation for details.
+    # 0=microcanonical ensemble
+    # 1=weak-coupling ensemble
+    # 2=Andersen-like thermostate
+    # 3=Langevin thermostate
+    ntt=1,
+##### Time constant in ps for heat bath coupling for the system, if ntt=1 (default=1.0). Recommended between 0.5 and 5.0.
+    tautp=5.0,
+
+##### Include all atoms in trajectory (0, default) or only from 1 to ntwprt.
+    ntwprt=0,
+    # Wrap (1) or not (0, default) every molecule in a "primary box". Set to 1 for long runs. Read documentation for details.
+    iwrap=1,
+    # Non-periodic systems: remove translational and rotational center of mass motion every nscm steps (default=1000).
+    # Periodic systems: remove translational center of mass motion every nscm steps (default=1000).
+    # Langevin dynamics (ntt=3): reset position of the center of mass every nscm steps (default=1000).
+    nscm=5000,
+    # SHAKE. No constraints (1, default), X-H bonds constraint (2), all bonds constraint (3).
+    ntc=2,
+    # Force evaluation. Exclude X-H interactions when ntc=2 (ntf=2).
+    ntf=2,
+##### Nonbonded cutoff in Angstroms. When igb=0 (default), cut default is 8.0.
+    cut=9.0,
+
+    # Save energy information in mdout and mdinfo every ntpr steps (default=50).
+    ntpr=500,
+##### Write restart file every ntwr steps (default=nstlim or maxcyc). If set < 0, write unique files every abs(ntwr) steps. Ideally > 100 000.
+    ntwr=500,
+    # Write coordinates to trajectory file every ntwx steps (default=0)
+    ntwx=500,
+##### Write energies and temperatures to mden file every ntwe steps (default=0)
+    ntwe=500,
+  /
+
+### Particle Mesh Ewald method. Why only here and in MD?
+  &ewald
+    ew_type=0,
+##### Default is 2.0 Angstroms.
+    skinnb=1.0,
+  /

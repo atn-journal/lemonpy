@@ -1,0 +1,67 @@
+# Arbitrary number of comments.
+Heating the system with 5 kcal/mol restraints on PROTEIN, V=const.
+  # " &cntrl" starts namelist block and is always required. The first character on each line of a namelist block must be a blank.
+  &cntrl
+##### Initial temperature. Velocities are assigned from a Maxwellian distribution at tempi. Why 100 K?
+    tempi=100.0,
+##### Temperature scaling. Read documentation for details.
+    # 0=microcanonical ensemble
+    # 1=weak-coupling ensemble
+    # 2=Andersen-like thermostate
+    # 3=Langevin thermostate
+    ntt=1,
+
+    # Apply restraint to atoms if ntr=1 (default=0)
+    ntr=1,
+    # String that specifies atoms, residues, atom types, etc. to restrain. For residues: ':first-last'. Read documentation for details.
+    restraintmask=':1-644',
+    # Force constant of restraint.
+    restraint_wt=5.0,
+
+    # Starting time in ps (default=0.0)
+    t=0.0,
+##### Time step in ps. 0.004 with HMR and SHAKE, 0.002 with SHAKE, 0.001 otherwise (default=0.001). It should be reduced for T > 300 K.
+    dt=0.002,
+    # Number of MD-steps to perform (default=1).
+    nstlim=50000,
+
+    # SHAKE. No constraints (1, default), X-H bonds constraint (2), all bonds constraint (3).
+    ntc=2,
+    # Force evaluation. Exclude X-H interactions when ntc=2 (ntf=2).
+    ntf=2,
+    # Periodic systems: remove translational center of mass motion every nscm steps (default=1000).
+    nscm=5000,
+##### Nonbonded cutoff in Angstroms. When igb=0 (default), cut default is 8.0.
+    cut=9.0,
+
+    # Save energy information in mdout and mdinfo every ntpr steps (default=50).
+    ntpr=500,
+##### Write restart file every ntwr steps (default=nstlim or maxcyc). If set < 0, write unique files every abs(ntwr) steps. Ideally > 100 000.
+    ntwr=500,
+    # Write coordinates to trajectory file every ntwx steps (default=0)
+    ntwx=500,
+##### Write energies and temperatures to mden file every ntwe steps (default=0)
+    ntwe=500,
+
+    # Weight (wt) changes will be read.
+    nmropt=1,
+  /
+
+  # Varying conditions.
+  &wt
+##### Change temperature of reference from value1 to value2, beteween istep1 and istep2. Set T of use of each enzyme as value2?
+    type='TEMP0',
+    istep1=0,
+    istep2=5000,
+    value1=100.0,
+    value2=300.0,
+  /
+  &wt
+    type='TEMP0',
+    istep1=5001,
+    istep2=50000,
+    value1=300.0,
+    value2=300.0,
+  /
+  &wt type='END',
+  /
