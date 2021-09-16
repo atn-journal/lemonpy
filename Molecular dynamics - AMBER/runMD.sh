@@ -43,7 +43,7 @@ else
 fi
 
 # Redirect stdout and stderr to log
-exec > >(tee $log.log) 2>&1
+exec 3>&1 4>&2 1> >(tee $log.log) 2>&1
 
 # Print variables
 echo topology=$prmtop
@@ -85,3 +85,6 @@ echo "$output finished"
 echo -e "##################################################\n"
 
 send-email.py "Terminó $output"
+
+# Stop redirection to log
+exec 1>&3 2>&4

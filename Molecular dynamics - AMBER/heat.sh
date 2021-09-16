@@ -44,7 +44,7 @@ V = const.
 EOF
 
 # Redirect stdout and stderr to log
-exec > >(tee heat.log) 2>&1
+exec 3>&1 4>&2 1> >(tee heat.log) 2>&1
 
 echo topology=$prmtop
 echo coordinates=$coord
@@ -58,5 +58,8 @@ echo -e "\n##################################################"
 echo "Heating took $((${SECONDS}/60)) min"
 echo -e "##################################################\n"
 
-#Display results in VMD
+# Stop redirection to log
+exec 1>&3 2>&4
+
+# Display results in VMD
 vmd ${prmtop}.prmtop ${prmtop}_heat.nc

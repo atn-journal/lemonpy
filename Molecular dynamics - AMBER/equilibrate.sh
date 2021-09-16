@@ -31,7 +31,7 @@ P = 1 bar and coupling = 0.2 ps.
 EOF
 
 # Redirect stdout and stderr to log
-exec > >(tee eq.log) 2>&1
+exec 3>&1 4>&2 1> >(tee eq.log) 2>&1
 
 echo topology=$prmtop
 echo coordinates=$coord
@@ -44,5 +44,8 @@ echo -e "\n##################################################"
 echo "Equilibration took $((${SECONDS}/60)) min"
 echo -e "##################################################\n"
 
-#Display results in VMD
+# Stop redirection to log
+exec 1>&3 2>&4
+
+# Display results in VMD
 vmd ${prmtop}.prmtop ${prmtop}_eq.nc

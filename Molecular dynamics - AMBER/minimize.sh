@@ -52,7 +52,7 @@ Minimizing the system with 25 kcal/mol restraints on PROTEIN,
 EOF
 
 # Redirect stdout and stderr to log
-exec > >(tee min.log) 2>&1
+exec 3>&1 4>&2 1> >(tee min.log) 2>&1
 
 echo topology=$prmtop
 echo residues=$res
@@ -66,5 +66,8 @@ echo -e "\n##################################################"
 echo "Minimization took ${SECONDS} s"
 echo -e "##################################################\n"
 
-#Display results in VMD
+# Stop redirection to log
+exec 1>&3 2>&4
+
+# Display results in VMD
 vmd ${prmtop}.prmtop -netcdf ${prmtop}_min1.rst -netcdf ${prmtop}_min2.rst -netcdf ${prmtop}_min3.rst
