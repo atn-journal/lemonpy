@@ -1,12 +1,12 @@
 # Arbitrary number of comments.
-Minimizing the system with 25 kcal/mol restraints on PROTEIN, 500 steps of steepest descent and 2000 of conjugated gradient.
+Minimizing the system with 25 kcal/mol restraints on PROTEIN, 2000 steps of steepest descent and 500 of conjugated gradient.
   # " &cntrl" starts namelist block and is always required. The first character on each line of a namelist block must be a blank.
   &cntrl
-    # Perform (1) or not (0, default) an energy minimization.
+    # Perform (1) or not (0, default) energy minimization.
     imin=1,
     # Method of minimization (default=1). If set to 1, perform steepest descent for ncyc cycles and then switch to conjugated gradient.
     ntmin=1,
-##### If ntmin=1 perform ncyc cycles of steepest descent and then switch to conjugated gradient (default=10).
+    # If ntmin=1 perform ncyc cycles of steepest descent and then switch to conjugated gradient (default=10).
     ncyc=2000,
     # Maximum number of cycles of minimization (default=1)
     maxcyc=2500,
@@ -14,22 +14,16 @@ Minimizing the system with 25 kcal/mol restraints on PROTEIN, 500 steps of steep
     # Apply restraint to atoms if ntr=1 (default=0)
     ntr=1,
     # String that specifies atoms, residues, atom types, etc. to restrain. For residues: ':first-last'. Read documentation for details.
-    restraintmask=':1-644',
+    restraintmask=':1-${res}',
     # Force constant of restraint.
     restraint_wt=25.0,
 
-##### Nonbonded cutoff in Angstroms. When igb=0 (default), cut default is 8.0.
+    # Nonbonded cutoff in Angstroms. When igb=0 (default), cut default is 8.0.
     cut=9.0,
-##### Determines the frequency of nonbonded list updates (default 25).
+    # Determines the frequency of nonbonded list updates (default 25).
     nsnb=10,
 
     # Save energy information in mdout and mdinfo every ntpr steps (default=50).
     ntpr=50,
   /
-
-### Particle Mesh Ewald method. Why only here and in MD?
-  &ewald
-    ew_type = 0,
-##### Default is 2.0 Angstroms.
-    skinnb = 1.0,
-  /
+  
