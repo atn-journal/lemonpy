@@ -52,7 +52,7 @@ echo residues=$res
 echo temperature=$temp
 
 # Heat the system
-pmemd.cuda -O -i heat.in -o ${prmtop}_heat.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${prmtop}_heat.rst -x ${prmtop}_heat.nc -ref ${coord}.rst
+pmemd.cuda -O -i heat.in -o ${prmtop}_heat.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${prmtop}_heat.rst -x ${prmtop}_heat.nc -ref ${coord}.rst -inf ${prmtop}_heat.mdinfo
 
 echo -e "\n##################################################"
 echo "Heating took $((${SECONDS}/60)) min"

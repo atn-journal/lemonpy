@@ -38,7 +38,7 @@ echo coordinates=$coord
 echo temperature=$temp
 
 # Equilibrate the system
-pmemd.cuda -O -i eq.in -o ${prmtop}_eq.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${prmtop}_eq.rst -x ${prmtop}_eq.nc
+pmemd.cuda -O -i eq.in -o ${prmtop}_eq.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${prmtop}_eq.rst -x ${prmtop}_eq.nc -inf ${prmtop}_eq.mdinfo
 
 echo -e "\n##################################################"
 echo "Equilibration took $((${SECONDS}/60)) min"
