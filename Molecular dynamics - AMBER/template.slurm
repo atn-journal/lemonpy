@@ -22,18 +22,37 @@ source /etc/profile.d/modules.sh
 module use /clusteruy/home03/biosim_ip/modulefiles
 module load amber18-tools19
 
-# Define basenames
+# Define basenames, path and T (in K, integer)
 top='prmtop'
 res='residues'
 inp='rst'
 out='trajectory'
 path='path'
+temp='temperature'
 
 echo topology=$top
 echo residues=$res
 echo input restart=$inp
 echo output trajectory=$out
 echo path=$path
+echo temperature=$temp
+
+# Create MD input file
+cat << EOF > md.in
+Molecular dynamics production of 50 ns
+  &cntrl
+    ntx=5,irest=1,
+    t=0.0,dt=0.002,nstlim=25000000,
+    temp0=${temp}.0,ntt=3,ig=-1,gamma_ln=5.0,
+    pres0=1.0,ntp=1,barostat=1,taup=5.0,
+    ntc=2,ntf=2,
+    iwrap=1,
+    nscm=5000,
+    cut=9.0,
+    ntpr=500,ntwr=12500000,ntwx=500,
+  /
+
+EOF
 
 # Move files to scratch
 mkdir -p /scratch/$USER/$SLURM_JOB_ID
@@ -55,7 +74,6 @@ rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 echo -e "Subject: Run $out finished in ClusterUY" | sendmail a@gmail.com
 
 # Second MD
-
 # Define names
 inp=$out
 out='trajectory'
