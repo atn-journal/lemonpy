@@ -22,13 +22,12 @@ source /etc/profile.d/modules.sh
 module use /clusteruy/home03/biosim_ip/modulefiles
 module load amber18-tools19
 
-# Define basenames, path and T (in K, integer)
+# Define basenames, T (in K, integer) and path
 top='prmtop'
-res='residues'
 inp='rst'
 out='trajectory'
-path='path'
 temp='temperature'
+path='path'
 
 echo topology=$top
 echo residues=$res
@@ -36,6 +35,11 @@ echo input restart=$inp
 echo output trajectory=$out
 echo path=$path
 echo temperature=$temp
+
+# Move files to scratch
+mkdir -p /scratch/$USER/$SLURM_JOB_ID
+cp ${path}/{${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
+cd /scratch/$USER/$SLURM_JOB_ID
 
 # Create MD input file
 cat << EOF > md.in
@@ -53,11 +57,6 @@ Molecular dynamics production of 50 ns
   /
 
 EOF
-
-# Move files to scratch
-mkdir -p /scratch/$USER/$SLURM_JOB_ID
-cp ${path}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
-cd /scratch/$USER/$SLURM_JOB_ID
 
 # RUN MD
 echo -e "\n##################################################"
