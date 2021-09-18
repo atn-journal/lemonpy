@@ -35,15 +35,8 @@ EOF
 # Define output
 output=${prmtop}_md${ns}ns
 
-if test $ns -eq 50
-  then
-    log=md${ns}ns
-else
-  log=md$(($ns-50))-$(($ns+50))ns
-fi
-
 # Redirect stdout and stderr to log
-exec 3>&1 4>&2 1> >(tee $log.log) 2>&1
+exec 3>&1 4>&2 1>> >(tee md$(($ns-50))ns.log) 2>&1
 
 # Print variables
 echo topology=$prmtop
