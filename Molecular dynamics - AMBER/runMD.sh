@@ -33,10 +33,10 @@ Molecular dynamics production of 50 ns
 EOF
 
 # Define output
-output=${prmtop}_md${ns}ns
+output=${prmtop}_md${ns}ns-${temp}K
 
 # Redirect stdout and stderr to log
-exec 3>&1 4>&2 1>> >(tee md$(($ns-50))ns.log) 2>&1
+exec 3>&1 4>&2 1>> >(tee MD_from$(($ns-50))ns-${temp}K.log) 2>&1
 
 # Print variables
 echo topology=$prmtop
@@ -60,7 +60,7 @@ send-email.py "Terminó $output"
 # Re-define variables
 coord=$output
 ns=$((${ns}+50))
-output=${prmtop}_md${ns}ns
+output=${prmtop}_md${ns}ns-${temp}K
 
 # Print variables
 echo input coordinates=$coord
