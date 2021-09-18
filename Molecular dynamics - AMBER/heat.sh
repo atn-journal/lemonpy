@@ -62,4 +62,6 @@ echo -e "##################################################\n"
 exec 1>&3 2>&4
 
 # Display results in VMD
-vmd ${prmtop}.prmtop ${prmtop}_heat.nc
+#vmd ${prmtop}.prmtop ${prmtop}_heat.nc
+
+#send-email.py "Terminó ${prmtop}_heat_${temp}K"

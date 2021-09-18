@@ -70,4 +70,6 @@ echo -e "##################################################\n"
 exec 1>&3 2>&4
 
 # Display results in VMD
-vmd ${prmtop}.prmtop -netcdf ${prmtop}_min1.rst -netcdf ${prmtop}_min2.rst -netcdf ${prmtop}_min3.rst
+#vmd ${prmtop}.prmtop -netcdf ${prmtop}_min1.rst -netcdf ${prmtop}_min2.rst -netcdf ${prmtop}_min3.rst
+
+#send-email.py "Terminó ${prmtop}_min3"

@@ -48,4 +48,6 @@ echo -e "##################################################\n"
 exec 1>&3 2>&4
 
 # Display results in VMD
-vmd ${prmtop}.prmtop ${prmtop}_eq.nc
+#vmd ${prmtop}.prmtop ${prmtop}_eq.nc
+
+#send-email.py "Terminó ${prmtop}_eq_${temp}K"
