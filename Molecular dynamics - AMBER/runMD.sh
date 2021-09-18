@@ -40,8 +40,7 @@ exec 3>&1 4>&2 1>> >(tee MD_from$(($ns-50))ns-${temp}K.log) 2>&1
 
 # Print variables
 echo topology=$prmtop
-echo input coordinates=$coord
-echo temperature=$temp
+echo input=$coord
 echo output=$output
 
 echo -e "\n##################################################"
@@ -63,8 +62,8 @@ ns=$((${ns}+50))
 output=${prmtop}_md${ns}ns-${temp}K
 
 # Print variables
-echo input coordinates=$coord
-echo output trajectory=$output
+echo input=$coord
+echo output=$output
 
 echo -e "\n##################################################"
 echo "Running $output"
