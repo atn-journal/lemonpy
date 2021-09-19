@@ -48,13 +48,15 @@ echo ID=$ID
 echo host=$host
 
 echo -e "\n##################################################"
+date
 echo "Running $output"
 echo -e "##################################################\n"
 
 # RUN MD
-time pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
+pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
 
 echo -e "\n##################################################"
+date
 echo "$output finished"
 echo -e "##################################################\n"
 
@@ -70,13 +72,15 @@ echo input=$coord
 echo output=$output
 
 echo -e "\n##################################################"
+date
 echo "Running $output"
 echo -e "##################################################\n"
 
 # RUN MD
-time pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
+pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
 
 echo -e "\n##################################################"
+date
 echo "$output finished"
 echo -e "##################################################\n"
 
