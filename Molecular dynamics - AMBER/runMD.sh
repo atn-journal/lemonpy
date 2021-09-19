@@ -1,17 +1,18 @@
 #!/bin/bash
 
-# Usage: ./runMD.sh -p {prmtop} -c {coordinates} -n {input_ns} -t {temperature}
+# Usage: ./runMD.sh -p {prmtop} -c {coordinates} -n {input_ns} -t {temperature} -i {ID}
 # Temperature must be an integer provided in K.
 # "input_ns" must be an integer.
 
 # Get topology, coordinates, temperature and expected ns of trajectory output
-while getopts :p:c:n:t: flag
+while getopts :p:c:n:t:i: flag
 do
     case "${flag}" in
         p) prmtop=$(basename ${OPTARG} .prmtop);;
         c) coord=$(basename ${OPTARG} .rst);;
         n) ns=$((${OPTARG}+50));;
         t) temp=${OPTARG};;
+        i) ID=${OPTARG};;
     esac
 done
 
@@ -32,8 +33,9 @@ Molecular dynamics production of 50 ns
 
 EOF
 
-# Define output
+# Define output name and host
 output=${prmtop}_md${ns}ns-${temp}K
+host=$(hostname)
 
 # Redirect stdout and stderr to log
 exec 3>&1 4>&2 1>> >(tee MD_from$(($ns-50))ns-${temp}K.log) 2>&1
@@ -42,6 +44,8 @@ exec 3>&1 4>&2 1>> >(tee MD_from$(($ns-50))ns-${temp}K.log) 2>&1
 echo topology=$prmtop
 echo input=$coord
 echo output=$output
+echo ID=$ID
+echo host=$host
 
 echo -e "\n##################################################"
 echo "Running $output"
@@ -54,7 +58,7 @@ echo -e "\n##################################################"
 echo "$output finished"
 echo -e "##################################################\n"
 
-send-email.py "Terminó $output"
+send-email.py "Run $output from $ID finished in $host"
 
 # Re-define variables
 coord=$output
@@ -76,7 +80,7 @@ echo -e "\n##################################################"
 echo "$output finished"
 echo -e "##################################################\n"
 
-send-email.py "Terminó $output"
+send-email.py "Run $output from $ID finished in $host"
 
 # Stop redirection to log
 exec 1>&3 2>&4
