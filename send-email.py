@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
+# -*- coding: utf-8 -*-
 
-# Adapted from https://realpython.com/python-send-email/
+# Adapted from https://realpython.com/python-send-email/ and https://stackoverflow.com/a/54853576
 
 import smtplib
 import ssl
 from sys import argv
+from email.message import EmailMessage
 
 port = 587  # For starttls
 smtp_server = "smtp.gmail.com"
@@ -14,21 +16,22 @@ password = ""
 
 if len(argv) == 3:
     subject = argv[1]
-    body = argv[2]
+    msg = argv[2]
 elif len(argv) == 2:
     subject = argv[1]
-    body = ":)"
+    msg = ":)"
 else:
     subject = "Hola"
-    body = ":)"
+    msg = ":)"
 
-message = f"""\
-Subject: {subject}
-
-{body}"""
+em = EmailMessage()
+em.set_content(msg)
+em['To'] = receiver_email
+em['From'] = sender_email
+em['Subject'] = subject
 
 context = ssl.create_default_context()
 with smtplib.SMTP(smtp_server, port) as server:
     server.starttls(context=context)
     server.login(sender_email, password)
-    server.sendmail(sender_email, receiver_email, message)
+    server.send_message(em)
