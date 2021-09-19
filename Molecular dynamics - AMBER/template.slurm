@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=id-Xns-TK
+#SBATCH --job-name=ID-Xns
 #SBATCH --time=100:00:00
 #SBATCH --tmp=50G
 #SBATCH --mail-user=a@gmail.com
@@ -12,7 +12,7 @@
 #SBATCH --mail-type=BEGIN,FAIL
 #SBATCH --output=%x.out
 
-echo $SLURM_JOB_ID
+echo job_ID=$SLURM_JOB_ID
 hostname
 
 # Load modules
@@ -35,7 +35,13 @@ email='@'
 ####################################################################################
 ####################################################################################
 
-ns_out=$(($ns_in+50))
+if test $ns_in -eq 0
+then
+  ns_out=050
+else
+  ns_out=$(($ns_in+50))
+fi
+
 output=${prmtop}_md${ns_out}ns-${temp}K
 
 echo topology=$top
