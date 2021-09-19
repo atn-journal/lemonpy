@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name=id-Xns
+#SBATCH --job-name=id-Xns-TK
 #SBATCH --time=100:00:00
 #SBATCH --tmp=50G
 #SBATCH --mail-user=a@gmail.com
@@ -10,10 +10,10 @@
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
 #SBATCH --mail-type=BEGIN,FAIL
+#SBATCH --output=%x.out
 
 echo $SLURM_JOB_ID
 hostname
-date
 
 # Load modules
 source /etc/profile.d/modules.sh
@@ -22,25 +22,27 @@ source /etc/profile.d/modules.sh
 module use /clusteruy/home03/biosim_ip/modulefiles
 module load amber18-tools19
 
-##################################################################
-##################################################################
-# Define basenames, input time, T (in K, integer), path and email
+####################################################################################
+####################################################################################
+# Define basenames, input time, T (in K, integer), path (no trailing '/') and email
 top='prmtop'
 inp='rst'
 ns_in='0'
 temp='temperature'
 path='path'
+ID='ID'
 email='@'
-##################################################################
-##################################################################
+####################################################################################
+####################################################################################
 
 ns_out=$(($ns_in+50))
-output=md${ns_out}ns-${temp}K
+output=${prmtop}_md${ns_out}ns-${temp}K
 
 echo topology=$top
 echo input=$inp
 echo output=$output
 echo path=$path
+echo ID=$notebook
 
 # Move files to scratch
 mkdir -p /scratch/$USER/$SLURM_JOB_ID
@@ -66,41 +68,43 @@ EOF
 
 # RUN MD
 echo -e "\n##################################################"
-date;echo "Running first MD"
+date
+echo "Running first MD"
 echo -e "##################################################\n"
 pmemd.cuda -O -i md.in -o ${output}.out -p ${top}.prmtop -c ${inp}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
 
 # Recover files and remove from scratch
-mkdir -p $path/${output}
-cp /scratch/$USER/$SLURM_JOB_ID/* $path/${output}/
+cp /scratch/$USER/$SLURM_JOB_ID/* $path/
 rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 
 # Send email
-echo -e "Subject: Run $output finished in ClusterUY" | sendmail $email
+echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
 
 # Second MD
 # Define names
 inp=$output
 ns_in=$ns_out
 ns_out=$(($ns_in+50))
-output=md${ns_out}ns-${temp}K
+output=${prmtop}_md${ns_out}ns-${temp}K
 
 echo new input=$inp
 echo new output=$output
 
 # Move files to scratch
-cp $path/${inp}/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
+cp $path/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
 
 # RUN MD
 echo -e "\n##################################################"
-date;echo "Running second MD"
+date
+echo "Running second MD"
 echo -e "##################################################\n"
 pmemd.cuda -O -i md.in -o ${output}.out -p ${top}.prmtop -c ${inp}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
 
+echo $output finished
+
 # Recover files and remove from scratch
-mkdir -p $path/${output}
-cp /scratch/$USER/$SLURM_JOB_ID/* $path/${output}/
+cp /scratch/$USER/$SLURM_JOB_ID/* $path/
 rm -rf /scratch/$USER/$SLURM_JOB_ID
 
 # Send email
-echo -e "Subject: Run $output finished in ClusterUY" | sendmail $email
+echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
