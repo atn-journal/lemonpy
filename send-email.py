@@ -2,10 +2,11 @@
 
 # Adapted from https://realpython.com/python-send-email/
 
-import smtplib, ssl
+import smtplib
+import ssl
 from sys import argv
 
-port = 465  # For SSL
+port = 587  # For starttls
 smtp_server = "smtp.gmail.com"
 sender_email = "@gmail.com"  # Enter your address
 receiver_email = "@gmail.com"  # Enter receiver address
@@ -27,6 +28,7 @@ Subject: {subject}
 {body}"""
 
 context = ssl.create_default_context()
-with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+with smtplib.SMTP(smtp_server, port) as server:
+    server.starttls(context=context)
     server.login(sender_email, password)
     server.sendmail(sender_email, receiver_email, message)
