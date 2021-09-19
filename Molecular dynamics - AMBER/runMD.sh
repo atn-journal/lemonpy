@@ -10,7 +10,12 @@ do
     case "${flag}" in
         p) prmtop=$(basename ${OPTARG} .prmtop);;
         c) coord=$(basename ${OPTARG} .rst);;
-        n) ns=$((${OPTARG}+50));;
+        n) if test ${OPTARG} -eq 0
+           then
+               ns='050'
+           else
+               ns=$((${OPTARG}+50))
+           fi
         t) temp=${OPTARG};;
         i) ID=${OPTARG};;
     esac
@@ -38,7 +43,7 @@ output=${prmtop}_md${ns}ns-${temp}K
 host=$(hostname)
 
 # Redirect stdout and stderr to log
-exec 3>&1 4>&2 1>> >(tee MD_from$(($ns-50))ns-${temp}K.log) 2>&1
+exec 3>&1 4>&2 1>> >(tee $ID-$(($ns+50))ns.log) 2>&1
 
 # Print variables
 echo topology=$prmtop
