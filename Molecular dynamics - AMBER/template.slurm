@@ -25,8 +25,7 @@ module load amber18-tools19
 ####################################################################################
 ####################################################################################
 # Define basenames, input time, T (in K, integer), path (no trailing '/') and email
-top='prmtop'
-inp='rst'
+prmtop='prmtop'
 ns_in='0'
 temp='temperature'
 path='path'
@@ -35,24 +34,24 @@ email='@'
 ####################################################################################
 ####################################################################################
 
+ns_out=$(($ns_in+50))
 if test $ns_in -eq 0
 then
-  ns_out=050
+    coord=${prmtop}_eq
+    output=${prmtop}_md0${ns_out}ns-${temp}K
 else
-  ns_out=$(($ns_in+50))
-fi
+    coord=${prmtop}_md${ns_in}ns-${temp}K
+    output=${prmtop}_md${ns_out}ns-${temp}K
 
-output=${prmtop}_md${ns_out}ns-${temp}K
-
-echo topology=$top
-echo input=$inp
+echo topology=$prmtop
+echo input=$coord
 echo output=$output
 echo path=$path
-echo ID=$notebook
+echo ID=$ID
 
 # Move files to scratch
 mkdir -p /scratch/$USER/$SLURM_JOB_ID
-cp ${path}/{${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
+cp ${path}/{${prmtop}.prmtop,${coord}.rst} /scratch/$USER/$SLURM_JOBID/
 cd /scratch/$USER/$SLURM_JOB_ID
 
 # Create MD input file
@@ -75,9 +74,9 @@ EOF
 # RUN MD
 echo -e "\n##################################################"
 date
-echo "Running first MD"
+echo "Running $output"
 echo -e "##################################################\n"
-pmemd.cuda -O -i md.in -o ${output}.out -p ${top}.prmtop -c ${inp}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
+pmemd.cuda -O -i md.in -o ${output}.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
 
 # Recover files and remove from scratch
 cp /scratch/$USER/$SLURM_JOB_ID/* $path/
@@ -86,28 +85,30 @@ rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 # Send email
 echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
 
-echo $output finished
-tail -n 19
+echo -e "\n############################################################"
+date
+echo "$output finished"
+tail -n 18 $output.out
+echo -e "############################################################\n"
 
-# Second MD
-# Define names
-inp=$output
+# Re-define names
+coord=$output
 ns_in=$ns_out
 ns_out=$(($ns_in+50))
 output=${prmtop}_md${ns_out}ns-${temp}K
 
-echo new input=$inp
+echo new input=$coord
 echo new output=$output
 
 # Move files to scratch
-cp $path/{md.in,${top}.prmtop,${inp}.rst} /scratch/$USER/$SLURM_JOBID/
+cp $path/{md.in,${prmtop}.prmtop,${coord}.rst} /scratch/$USER/$SLURM_JOBID/
 
 # RUN MD
 echo -e "\n##################################################"
 date
-echo "Running second MD"
+echo "Running $output"
 echo -e "##################################################\n"
-pmemd.cuda -O -i md.in -o ${output}.out -p ${top}.prmtop -c ${inp}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
+pmemd.cuda -O -i md.in -o ${output}.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
 
 # Recover files and remove from scratch
 cp /scratch/$USER/$SLURM_JOB_ID/* $path/
@@ -116,5 +117,8 @@ rm -rf /scratch/$USER/$SLURM_JOB_ID
 # Send email
 echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
 
-echo $output finished
-tail -n 19
+echo -e "\n############################################################"
+date
+echo "$output finished"
+tail -n 18 $output.out
+echo -e "############################################################\n"

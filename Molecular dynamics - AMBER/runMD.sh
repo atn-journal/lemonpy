@@ -1,21 +1,15 @@
 #!/bin/bash
 
-# Usage: ./runMD.sh -p {prmtop} -c {coordinates} -n {input_ns} -t {temperature} -i {ID}
+# Usage: ./runMD.sh -p {prmtop} -n {input_ns} -t {temperature} -i {ID}
 # Temperature must be an integer provided in K.
 # "input_ns" must be an integer.
 
-# Get topology, coordinates, temperature and expected ns of trajectory output
+# Get topology, temperature and input ns
 while getopts :p:c:n:t:i: flag
 do
     case "${flag}" in
         p) prmtop=$(basename ${OPTARG} .prmtop);;
-        c) coord=$(basename ${OPTARG} .rst);;
-        n) if test ${OPTARG} -eq 0
-           then
-               ns='050'
-           else
-               ns=$((${OPTARG}+50))
-           fi
+        n) ns_in=${OPTARG};;
         t) temp=${OPTARG};;
         i) ID=${OPTARG};;
     esac
@@ -38,12 +32,20 @@ Molecular dynamics production of 50 ns
 
 EOF
 
-# Define output name and host
-output=${prmtop}_md${ns}ns-${temp}K
+# Define input coord., output name and host
 host=$(hostname)
+ns_out=$(($ns_in+50))
+if test $ns_in -eq 0
+then
+    coord=${prmtop}_eq
+    output=${prmtop}_md0${ns_out}ns-${temp}K
+else
+    coord=${prmtop}_md${ns_in}ns-${temp}K
+    output=${prmtop}_md${ns_out}ns-${temp}K
+fi
 
 # Redirect stdout and stderr to log
-exec 3>&1 4>&2 1>> >(tee $ID-$(($ns+50))ns.log) 2>&1
+exec 3>&1 4>&2 1>> >(tee $ID-$(($ns_in+100))ns.log) 2>&1
 
 # Print variables
 echo topology=$prmtop
@@ -60,19 +62,18 @@ echo -e "##################################################\n"
 # RUN MD
 pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
 
-echo -e "\n##################################################"
+send-email.py "Run $output from $ID finished in $host"
+
+echo -e "\n############################################################"
 date
 echo "$output finished"
-echo -e "##################################################\n"
-
-tail -n 19
-
-send-email.py "Run $output from $ID finished in $host"
+tail -n 18 $output.out
+echo -e "############################################################\n"
 
 # Re-define variables
 coord=$output
-ns=$((${ns}+50))
-output=${prmtop}_md${ns}ns-${temp}K
+ns_out=$((${ns_out}+50))
+output=${prmtop}_md${ns_out}ns-${temp}K
 
 # Print variables
 echo input=$coord
@@ -86,14 +87,13 @@ echo -e "##################################################\n"
 # RUN MD
 pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
 
-echo -e "\n##################################################"
+send-email.py "Run $output from $ID finished in $host"
+
+echo -e "\n############################################################"
 date
 echo "$output finished"
-echo -e "##################################################\n"
-
-tail -n 19
-
-send-email.py "Run $output from $ID finished in $host"
+tail -n 18 $output.out
+echo -e "############################################################\n"
 
 # Stop redirection to log
 exec 1>&3 2>&4
