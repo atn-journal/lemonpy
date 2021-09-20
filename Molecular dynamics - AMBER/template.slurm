@@ -86,6 +86,8 @@ rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 # Send email
 echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
 
+echo $output finished
+
 # Second MD
 # Define names
 inp=$output
@@ -106,11 +108,11 @@ echo "Running second MD"
 echo -e "##################################################\n"
 pmemd.cuda -O -i md.in -o ${output}.out -p ${top}.prmtop -c ${inp}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
 
-echo $output finished
-
 # Recover files and remove from scratch
 cp /scratch/$USER/$SLURM_JOB_ID/* $path/
 rm -rf /scratch/$USER/$SLURM_JOB_ID
 
 # Send email
 echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
+
+echo $output finished
