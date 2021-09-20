@@ -65,6 +65,8 @@ date
 echo "$output finished"
 echo -e "##################################################\n"
 
+tail -n 19
+
 send-email.py "Run $output from $ID finished in $host"
 
 # Re-define variables
@@ -88,6 +90,8 @@ echo -e "\n##################################################"
 date
 echo "$output finished"
 echo -e "##################################################\n"
+
+tail -n 19
 
 send-email.py "Run $output from $ID finished in $host"
 

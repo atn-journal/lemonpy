@@ -87,6 +87,7 @@ rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
 
 echo $output finished
+tail -n 19
 
 # Second MD
 # Define names
@@ -116,3 +117,4 @@ rm -rf /scratch/$USER/$SLURM_JOB_ID
 echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
 
 echo $output finished
+tail -n 19
