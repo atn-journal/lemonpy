@@ -9,18 +9,8 @@
 #SBATCH --ntasks=1
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
-#SBATCH --mail-type=BEGIN,FAIL
+#SBATCH --mail-type=FAIL
 #SBATCH --output=%x.out
-
-echo job_ID=$SLURM_JOB_ID
-hostname
-
-# Load modules
-source /etc/profile.d/modules.sh
-
-# Load AMBER
-module use /clusteruy/home03/biosim_ip/modulefiles
-module load amber18-tools19
 
 ####################################################################################
 ####################################################################################
@@ -34,6 +24,16 @@ email='@'
 ####################################################################################
 ####################################################################################
 
+echo job_ID=$SLURM_JOB_ID
+hostname
+
+# Load modules
+source /etc/profile.d/modules.sh
+
+# Load AMBER
+module use /clusteruy/home03/biosim_ip/modulefiles
+module load amber18-tools19
+
 ns_out=$(($ns_in+50))
 if test $ns_in -eq 0
 then
@@ -42,6 +42,7 @@ then
 else
     coord=${prmtop}_md${ns_in}ns-${temp}K
     output=${prmtop}_md${ns_out}ns-${temp}K
+fi
 
 echo topology=$prmtop
 echo input=$coord
@@ -70,6 +71,8 @@ Molecular dynamics production of 50 ns
   /
 
 EOF
+
+echo -e "Subject: Run $output from $ID started in ClusterUY" | sendmail $email
 
 # RUN MD
 echo -e "\n##################################################"
@@ -102,6 +105,8 @@ echo new output=$output
 
 # Move files to scratch
 cp $path/{md.in,${prmtop}.prmtop,${coord}.rst} /scratch/$USER/$SLURM_JOBID/
+
+echo -e "Subject: Run $output from $ID started in ClusterUY" | sendmail $email
 
 # RUN MD
 echo -e "\n##################################################"
