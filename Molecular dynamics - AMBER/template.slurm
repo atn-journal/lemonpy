@@ -72,8 +72,6 @@ Molecular dynamics production of 50 ns
 
 EOF
 
-echo -e "Subject: Run $output from $ID started in ClusterUY" | sendmail $email
-
 # RUN MD
 echo -e "\n##################################################"
 date
@@ -105,8 +103,6 @@ echo new output=$output
 
 # Move files to scratch
 cp $path/{md.in,${prmtop}.prmtop,${coord}.rst} /scratch/$USER/$SLURM_JOBID/
-
-echo -e "Subject: Run $output from $ID started in ClusterUY" | sendmail $email
 
 # RUN MD
 echo -e "\n##################################################"
