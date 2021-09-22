@@ -83,9 +83,6 @@ pmemd.cuda -O -i md.in -o ${output}.out -p ${prmtop}.prmtop -c ${coord}.rst -r $
 cp /scratch/$USER/$SLURM_JOB_ID/* $path/
 rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 
-# Send email
-echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
-
 echo -e "\n############################################################"
 date
 echo "$output finished"

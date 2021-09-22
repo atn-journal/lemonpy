@@ -62,8 +62,6 @@ echo -e "##################################################\n"
 # RUN MD
 pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
 
-send-email.py "Run $output from $ID finished in $host"
-
 echo -e "\n############################################################"
 date
 echo "$output finished"
