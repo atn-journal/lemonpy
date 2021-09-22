@@ -86,7 +86,7 @@ rm -rf /scratch/$USER/$SLURM_JOB_ID/*
 echo -e "\n############################################################"
 date
 echo "$output finished"
-tail -n 18 $output.out
+tail -n 18 $path/$output.out
 echo -e "############################################################\n"
 
 # Re-define names
@@ -118,5 +118,5 @@ echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
 echo -e "\n############################################################"
 date
 echo "$output finished"
-tail -n 18 $output.out
+tail -n 18 $path/$output.out
 echo -e "############################################################\n"
