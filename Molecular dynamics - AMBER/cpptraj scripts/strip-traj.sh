@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 
-# Usage: ./strip-traj.sh -p {prmtop} -t {trajectory}
+# Usage: ./strip-traj.sh -t {trajectory}
 
 # Get topology and trajectory
-while getopts :p:t: flag
+while getopts :t: flag
 do
     case "${flag}" in
-        p) prmtop=$(basename ${OPTARG} .prmtop);;
         t) nc=$(basename ${OPTARG} .nc);;
     esac
 done
+
+prmtop=${nc%_*}
 
 # Write out script to strip trajectory
 cat << EOF > strip-traj.in
