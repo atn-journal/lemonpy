@@ -18,7 +18,6 @@ parmstrip :Cl-
 parmstrip :WAT
 parmwrite out ${prmtop}_dry.prmtop
 go
-
 EOF
 
 # Redirect stdout and stderr to log

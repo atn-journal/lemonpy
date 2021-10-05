@@ -3,7 +3,7 @@
 # Usage: ./join-traj.sh -p {prmtop} -t {first_trajectory} -j {trajectory_to_add}
 
 # Redirect stdout and stderr to log
-exec > >(tee join.log) 2>&1
+exec > >(tee join-traj.log) 2>&1
 
 # Get topology and trajectories to join
 while getopts :p:t:j: flag
@@ -34,7 +34,6 @@ done
 cat << EOF >> join.in
 trajout ${nc2}_join.nc netcdf
 go
-
 EOF
 
 # Join trajectories
