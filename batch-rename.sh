@@ -1,0 +1,1 @@
+for filename in *md???ns*.*; do newname=`echo $filename | sed -e "s/md\(...\)ns/md0\1ns/g"`; mv $filename $newname; done
