@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=ID-join-1us-traj
-#SBATCH --time=20:00:00
+#SBATCH --time=04:00:00
 #SBATCH --mail-user=a@gmail.com
 #SBATCH --partition=normal
 #SBATCH --nodes=1
@@ -14,6 +14,7 @@
 # Define topology, T (in K, integer), path (no trailing '/') and email
 prmtop='prmtop'
 temp='temperature'
+skip_frames='skip'
 email='@'
 #######################################################################
 #######################################################################
@@ -34,13 +35,11 @@ echo ID=$ID
 # Write out script
 cat << EOF > join.in
 parm ${prmtop}.prmtop
-trajin *md*ns-${temp}K.nc
+trajin *md*ns-${temp}K.nc 1 last $skip_frames
 autoimage
-strip :WAT
-strip :Na+
-strip :Cl-
+strip :WAT,Na+,Cl- parmout ${prmtop}_dry.prmtop
 trajout ${prmtop}_md1us-${temp}K_dry.nc netcdf
-go
+run
 EOF
 
 # Execute script
