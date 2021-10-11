@@ -13,9 +13,7 @@ done
 # Write out script to strip topology file
 cat << EOF > strip-prmtop.in
 parm ${prmtop}.prmtop
-parmstrip :Na+
-parmstrip :Cl-
-parmstrip :WAT
+parmstrip :WAT,Na+,Cl-
 parmwrite out ${prmtop}_dry.prmtop
 go
 EOF

@@ -10,7 +10,7 @@ do
     esac
 done
 
-prmtop=${nc%_*}
+prmtop=${nc%md*}dry
 
 # Write out script to delete 90 % of frames from trajectory
 cat << EOF > reduce.in

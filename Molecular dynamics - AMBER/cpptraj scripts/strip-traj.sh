@@ -17,9 +17,7 @@ cat << EOF > strip-traj.in
 parm ${prmtop}.prmtop
 trajin ${nc}.nc
 autoimage
-strip :Na+
-strip :Cl-
-strip :WAT
+strip :WAT,Na+,Cl- parmout ${prmtop}_dry.prmtop
 trajout ${nc}_dry.nc netcdf
 go
 
