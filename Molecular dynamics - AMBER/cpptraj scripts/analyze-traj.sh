@@ -1,26 +1,78 @@
 #!/usr/bin/env bash
 
-# Usage: ./analyze-traj.sh -p {prmtop} -t {trajectory} -r {residues}
+# Usage: ./analyze-traj.sh -p {prmtop} -t {trajectory} -r {residues} -s {skip}
 
 # Get topology, trajectory and number of residues
-while getopts :p:t: flag
+while getopts :p:t:r:s: flag
 do
     case "${flag}" in
         p) prmtop=$(basename ${OPTARG} .prmtop);;
         t) nc=$(basename ${OPTARG} .nc);;
         r) res=${OPTARG};;
+        s) skip=${OPTARG};;
     esac
 done
 
-# Write out script for analysis
-cat << EOF > analyze.in
+# Write out scripts for analysis
+cat << EOF > RMSD.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc
-rms first mass out ${nc}_rmsd.dat :1-${res}
-nativecontacts :1-${res} writecontacts ${nc}_contacts.dat resout ${nc}_residue-pairs.dat out ${nc}_allcontacts.dat byresidue contactpdb ${nc}_nativecontact.pdb mapout ${nc}_map.dat nncontactpdb ${nc}_nncontact.pdb
-molsurf sas :1-${res} out ${nc}_sas.dat
-go
+trajin ${nc}.nc 1 last $skip
+rmsd :1-${res}@CA,C,N \
+    first \
+    mass \
+    out rmsd.dat
+rms2d :1-${res}@CA,C,N \
+    mass \
+    out rmsd-2d.dat
+EOF
 
+cat << EOF > RMSF.in
+parm ${prmtop}.prmtop
+trajin ${nc}.nc 1 last $skip
+rmsd :1-${res}@CA,C,N first
+average :1-${res}@CA,C,N \
+    crdset AVG
+run
+rmsd :1-${res}@CA,C,N \
+    ref AVG
+rmsf :1-${res}@CA,C,N \
+    byres \
+    out rmsf.dat
+run
+EOF
+
+cat << EOF > CONTACTS.in
+parm ${prmtop}.prmtop
+trajin ${nc}.nc 1 last $skip
+rmsd :1-${res}@CA,C,N first
+nativecontacts :1-${res} \
+    byresidue resoffset 4 \
+    writecontacts contacts_native.dat \
+    resout contacts_residue-pairs.dat \
+    out contacts_all.dat \
+    contactpdb contacts_native-strength.pdb \
+    map mapout contacts_map.dat \
+    savenonnative nncontactpdb contacts_non-native-strength.pdb
+run
+EOF
+
+cat << EOF > SAS.in
+parm ${prmtop}.prmtop
+trajin ${nc}.nc 1 last $skip
+rmsd :1-${res}@CA,C,N first
+molsurf :1-${res} \
+    out sas.dat
+run
+EOF
+
+cat << EOF > HBONDS.in
+parm ${prmtop}.prmtop
+trajin ${nc}.nc 1 last $skip
+rmsd :1-${res}@CA,C,N first
+hbond :1-${res} \
+    avgout hbonds_avg.dat printatomnum \
+    series uuseries hbonds_series.dat
+run
 EOF
 
 # Redirect stdout and stderr to log
@@ -31,4 +83,8 @@ echo trajectory=$nc
 echo residues=$res
 
 # Run analysis
-cpptraj -i analyze.in
+cpptraj -i RMSD.in
+cpptraj -i RMSF.in
+cpptraj -i CONTACTS.in
+cpptraj -i SAS.in
+cpptraj -i HBONDS.in
