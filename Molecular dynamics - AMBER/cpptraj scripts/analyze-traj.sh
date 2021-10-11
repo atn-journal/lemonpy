@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Usage: ./analyze-traj.sh -p {prmtop} -t {trajectory} -r {residues} -s {skip}
+# Usage: ./analyze-traj.sh -p {prmtop} -t {trajectory} -r {residues}
 
 # Get topology, trajectory and number of residues
 while getopts :p:t:r:s: flag
@@ -9,9 +9,10 @@ do
         p) prmtop=$(basename ${OPTARG} .prmtop);;
         t) nc=$(basename ${OPTARG} .nc);;
         r) res=${OPTARG};;
-        s) skip=${OPTARG};;
     esac
 done
+
+skip=1
 
 # Write out scripts for analysis
 cat << EOF > RMSD.in
@@ -30,6 +31,8 @@ cat << EOF > RMSF.in
 parm ${prmtop}.prmtop
 trajin ${nc}.nc 1 last $skip
 rmsd :1-${res}@CA,C,N first
+trajout ${prmtop}_Bfactor.pdb pdb stop 1
+run
 average :1-${res}@CA,C,N \
     crdset AVG
 run
@@ -38,6 +41,13 @@ rmsd :1-${res}@CA,C,N \
 rmsf :1-${res}@CA,C,N \
     byres \
     out rmsf.dat
+run
+rmsf Bfactor :1-${res}@CA,C,N \
+    bfactor
+run
+loadcrd ${prmtop}_Bfactor.pdb PDB
+crdout PDB ${prmtop}_Bfactor.pdb \
+    bfacdata Bfactor
 run
 EOF
 
@@ -75,6 +85,18 @@ hbond :1-${res} \
 run
 EOF
 
+cat << EOF > CLUSTER.in
+parm ${prmtop}.prmtop
+trajin ${nc}.nc 1 last $skip
+cluster rms :1-${res}@CA,C,N \
+    sieve 10 \
+    summary clusters.dat \
+    cpopvtime cluster-population-vs-time.dat normframe \
+    singlerepout clusters.nc \
+    repout cluster repfmt pdb
+run
+EOF
+
 # Redirect stdout and stderr to log
 exec > >(tee analyze.log) 2>&1
 
@@ -88,3 +110,4 @@ cpptraj -i RMSF.in
 cpptraj -i CONTACTS.in
 cpptraj -i SAS.in
 cpptraj -i HBONDS.in
+cpptraj -i CLUSTER.in
