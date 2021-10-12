@@ -3,7 +3,7 @@
 # Usage: ./analyze-traj.sh -p {prmtop} -t {trajectory} -r {residues}
 
 # Get topology, trajectory and number of residues
-while getopts :p:t:r:s: flag
+while getopts :p:t:r: flag
 do
     case "${flag}" in
         p) prmtop=$(basename ${OPTARG} .prmtop);;
