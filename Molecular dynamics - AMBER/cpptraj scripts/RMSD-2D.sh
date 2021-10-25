@@ -16,7 +16,7 @@ done
 skip=10
 
 # Write out script for analysis
-cat << EOF > RMSD-2D.in
+cat << EOF > ${prmtop}_RMSD-2D.in
 parm $prmtop.prmtop
 loadcrd $nc1.nc 1 last $skip name first
 loadcrd $nc2.nc 1 last $skip name second
@@ -42,4 +42,4 @@ echo trajectory2=$nc2
 echo residues=$res
 
 # Run analysis
-cpptraj -i RMSD-2D.in
+cpptraj.OMP -i ${prmtop}_RMSD-2D.in
