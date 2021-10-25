@@ -63,6 +63,27 @@ nativecontacts :1-${res} \
     contactpdb contacts_native-strength.pdb \
     map mapout contacts_map.dat \
     savenonnative nncontactpdb contacts_non-native-strength.pdb
+nativecontacts :1-$((${res}/2)) :$((${res}/2+1))-$res \
+    byresidue resoffset 4 \
+    out contacts-inter_all.dat \
+    contactpdb contacts-inter_native-strength.pdb \
+    map mapout contacts-inter_map.dat \
+    savenonnative nncontactpdb contacts-inter_non-native-strength.pdb \
+    series resseries present resseriesout contacts-inter_series.dat
+nativecontacts :TRP,TYR,MET,ALA,ILE,LEU,PHE,VAL,PRO,GLY \
+    byresidue resoffset 4 \
+    out contacts-hydrophobic_all.dat \
+    contactpdb contacts-hydrophobic_native-strength.pdb \
+    map mapout contacts-hydrophobic_map.dat \
+    savenonnative nncontactpdb contacts-hydrophobic_non-native-strength.pdb \
+    series resseries present resseriesout contacts-hydrophobic_series.dat
+nativecontacts :ARG,LYS,ASP,GLU,GLN,ASN,HIS,SER,THR,TYR,CYS \
+    byresidue resoffset 4 \
+    out contacts-hydrophilic_all.dat \
+    contactpdb contacts-hydrophilic_native-strength.pdb \
+    map mapout contacts-hydrophilic_map.dat \
+    savenonnative nncontactpdb contacts-hydrophilic_non-native-strength.pdb \
+    series resseries present resseriesout contacts-hydrophilic_series.dat
 run
 EOF
 
@@ -105,9 +126,9 @@ echo trajectory=$nc
 echo residues=$res
 
 # Run analysis
-cpptraj -i RMSD.in
-cpptraj -i RMSF.in
-cpptraj -i CONTACTS.in
-cpptraj -i SAS.in
-cpptraj -i HBONDS.in
-cpptraj -i CLUSTER.in
+cpptraj.OMP -i RMSD.in
+cpptraj.OMP -i RMSF.in
+cpptraj.OMP -i CONTACTS.in
+cpptraj.OMP -i SAS.in
+cpptraj.OMP -i HBONDS.in
+cpptraj.OMP -i CLUSTER.in
