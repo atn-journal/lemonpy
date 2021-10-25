@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=ID-Xns
-#SBATCH --time=100:00:00
-#SBATCH --tmp=50G
+#SBATCH --time=5-00:00:00
+#SBATCH --tmp=40G
 #SBATCH --mail-user=a@gmail.com
 ##SBATCH --dependency=afterok:JOBID
 #SBATCH --partition=normal
@@ -9,6 +9,7 @@
 #SBATCH --ntasks=1
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
+##SBATCH --exclude=node[15-17,23-28,31]
 #SBATCH --mail-type=FAIL
 #SBATCH --output=%x.out
 
@@ -35,9 +36,14 @@ module use /clusteruy/home03/biosim_ip/modulefiles
 module load amber18-tools19
 
 ns_out=$(($ns_in+50))
-if test $ns_in -eq 0
+
+if $ns_in -eq 0
 then
     coord=${prmtop}_eq
+    output=${prmtop}_md00${ns_out}ns-${temp}K
+elif $ns_in -lt 1000
+then
+    coord=${prmtop}_md0${ns_in}ns-${temp}K
     output=${prmtop}_md0${ns_out}ns-${temp}K
 else
     coord=${prmtop}_md${ns_in}ns-${temp}K
@@ -89,11 +95,20 @@ echo "$output finished"
 tail -n 18 $path/$output.out
 echo -e "############################################################\n"
 
+####################################################################################
 # Re-define names
 coord=$output
 ns_in=$ns_out
 ns_out=$(($ns_in+50))
-output=${prmtop}_md${ns_out}ns-${temp}K
+
+if $ns_in -lt 1000
+then
+    coord=${prmtop}_md0${ns_in}ns-${temp}K
+    output=${prmtop}_md0${ns_out}ns-${temp}K
+else
+    coord=${prmtop}_md${ns_in}ns-${temp}K
+    output=${prmtop}_md${ns_out}ns-${temp}K
+fi
 
 echo new input=$coord
 echo new output=$output
