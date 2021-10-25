@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=ID-join-1us-traj
-#SBATCH --time=04:00:00
+#SBATCH --time=10:00:00
 #SBATCH --mail-user=a@gmail.com
 #SBATCH --partition=normal
 #SBATCH --nodes=1
