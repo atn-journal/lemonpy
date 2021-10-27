@@ -37,11 +37,11 @@ module load amber18-tools19
 
 ns_out=$(($ns_in+50))
 
-if $ns_in -eq 0
+if test $ns_in -eq 0
 then
     coord=${prmtop}_eq
     output=${prmtop}_md00${ns_out}ns-${temp}K
-elif $ns_in -lt 1000
+elif test $ns_in -lt 1000
 then
     coord=${prmtop}_md0${ns_in}ns-${temp}K
     output=${prmtop}_md0${ns_out}ns-${temp}K
@@ -73,7 +73,7 @@ Molecular dynamics production of 50 ns
     iwrap=1,
     nscm=5000,
     cut=9.0,
-    ntpr=500,ntwr=12500000,ntwx=500,
+    ntpr=500,ntwr=12500000,ntwx=5000,
   /
 
 EOF
@@ -101,7 +101,11 @@ coord=$output
 ns_in=$ns_out
 ns_out=$(($ns_in+50))
 
-if $ns_in -lt 1000
+if test $ns_in -lt 100
+then
+    coord=${prmtop}_md00${ns_in}ns-${temp}K
+    output=${prmtop}_md00${ns_out}ns-${temp}K
+elif test $ns_in -lt 1000
 then
     coord=${prmtop}_md0${ns_in}ns-${temp}K
     output=${prmtop}_md0${ns_out}ns-${temp}K

@@ -5,7 +5,7 @@
 # "input_ns" must be an integer.
 
 # Get topology, temperature and input ns
-while getopts :p:c:n:t:i: flag
+while getopts :p:n:t:i: flag
 do
     case "${flag}" in
         p) prmtop=$(basename ${OPTARG} .prmtop);;
@@ -27,17 +27,26 @@ Molecular dynamics production of 50 ns
     iwrap=1,
     nscm=5000,
     cut=9.0,
-    ntpr=500,ntwr=12500000,ntwx=500,
+    ntpr=500,ntwr=12500000,ntwx=5000,
   /
-
 EOF
 
 # Define input coord., output name and host
 host=$(hostname)
+
 ns_out=$(($ns_in+50))
+
 if test $ns_in -eq 0
 then
     coord=${prmtop}_eq
+    output=${prmtop}_md00${ns_out}ns-${temp}K
+elif test $ns_in -lt 100
+then
+    coord=${prmtop}_md00${ns_in}ns-${temp}K
+    output=${prmtop}_md00${ns_out}ns-${temp}K
+elif test $ns_in -lt 1000
+then
+    coord=${prmtop}_md0${ns_in}ns-${temp}K
     output=${prmtop}_md0${ns_out}ns-${temp}K
 else
     coord=${prmtop}_md${ns_in}ns-${temp}K
@@ -68,10 +77,23 @@ echo "$output finished"
 tail -n 18 $output.out
 echo -e "############################################################\n"
 
+#################################################################################################
 # Re-define variables
 coord=$output
 ns_out=$((${ns_out}+50))
-output=${prmtop}_md${ns_out}ns-${temp}K
+
+if test $ns_in -lt 100
+then
+    coord=${prmtop}_md00${ns_in}ns-${temp}K
+    output=${prmtop}_md00${ns_out}ns-${temp}K
+elif test $ns_in -lt 1000
+then
+    coord=${prmtop}_md0${ns_in}ns-${temp}K
+    output=${prmtop}_md0${ns_out}ns-${temp}K
+else
+    coord=${prmtop}_md${ns_in}ns-${temp}K
+    output=${prmtop}_md${ns_out}ns-${temp}K
+fi
 
 # Print variables
 echo input=$coord
