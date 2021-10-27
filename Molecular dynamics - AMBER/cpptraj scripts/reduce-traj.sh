@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 
-# Usage: ./reduce-traj.sh -t {trajectory}
+# Usage: ./reduce-traj.sh -p {prmtop} -t {trajectory} -s {skip}
 
 # Get topology and trajectory
-while getopts :t: flag
+while getopts :p:t:s: flag
 do
     case "${flag}" in
         t) nc=$(basename ${OPTARG} .nc);;
+        p) prmtop=$(basename ${OPTARG} .prmtop);;
+        s) skip=${OPTARG};;
     esac
 done
 
-prmtop=${nc%md*}dry
-
-# Write out script to delete 90 % of frames from trajectory
-cat << EOF > reduce.in
+# Write out script
+cat << EOF > REDUCE-TRAJ.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last 10
-trajout ${nc}_small.nc netcdf
+trajin ${nc}.nc 1 last $skip
+trajout ${nc}_offset${skip}.nc netcdf
 go
 EOF
 
@@ -27,4 +27,4 @@ echo topology=$prmtop
 echo trajectory=$nc
 
 # Reduce trajectory
-cpptraj -i reduce.in
+cpptraj -i REDUCE-TRAJ.in

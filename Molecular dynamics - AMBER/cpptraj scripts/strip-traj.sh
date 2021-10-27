@@ -1,26 +1,24 @@
 #!/usr/bin/env bash
 
-# Usage: ./strip-traj.sh -t {trajectory}
+# Usage: ./strip-traj.sh -p {prmtop} -t {trajectory}
 
 # Get topology and trajectory
-while getopts :t: flag
+while getopts :p:t: flag
 do
     case "${flag}" in
+        p) prmtop=$(basename ${OPTARG} .prmtop);;
         t) nc=$(basename ${OPTARG} .nc);;
     esac
 done
 
-prmtop=${nc%_*}
-
 # Write out script to strip trajectory
-cat << EOF > strip-traj.in
+cat << EOF > STRIP-TRAJ.in
 parm ${prmtop}.prmtop
 trajin ${nc}.nc
 autoimage
 strip :WAT,Na+,Cl- parmout ${prmtop}_dry.prmtop
 trajout ${nc}_dry.nc netcdf
 go
-
 EOF
 
 # Redirect stdout and stderr to log
@@ -30,4 +28,4 @@ echo topology=$prmtop
 echo trajectory=$nc
 
 # Strip trajectory
-cpptraj -i strip-traj.in
+cpptraj -i STRIP-TRAJ.in
