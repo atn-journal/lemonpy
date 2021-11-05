@@ -41,13 +41,9 @@ if test $ns_in -eq 0
 then
     coord=${prmtop}_eq
     output=${prmtop}_md00${ns_out}ns-${temp}K
-elif test $ns_in -lt 1000
-then
-    coord=${prmtop}_md0${ns_in}ns-${temp}K
-    output=${prmtop}_md0${ns_out}ns-${temp}K
 else
-    coord=${prmtop}_md${ns_in}ns-${temp}K
-    output=${prmtop}_md${ns_out}ns-${temp}K
+    coord=${prmtop}_md$(printf "%04d" $ns_in)ns-${temp}K
+    output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
 fi
 
 echo topology=$prmtop
@@ -100,19 +96,7 @@ echo -e "############################################################\n"
 coord=$output
 ns_in=$ns_out
 ns_out=$(($ns_in+50))
-
-if test $ns_in -lt 100
-then
-    coord=${prmtop}_md00${ns_in}ns-${temp}K
-    output=${prmtop}_md00${ns_out}ns-${temp}K
-elif test $ns_in -lt 1000
-then
-    coord=${prmtop}_md0${ns_in}ns-${temp}K
-    output=${prmtop}_md0${ns_out}ns-${temp}K
-else
-    coord=${prmtop}_md${ns_in}ns-${temp}K
-    output=${prmtop}_md${ns_out}ns-${temp}K
-fi
+output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
 
 echo new input=$coord
 echo new output=$output
