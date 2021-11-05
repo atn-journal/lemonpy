@@ -87,12 +87,14 @@ nativecontacts :ARG,LYS,ASP,GLU,GLN,ASN,HIS,SER,THR,TYR,CYS \
 run
 EOF
 
-cat << EOF > SAS.in
+cat << EOF > SASA.in
 parm ${prmtop}.prmtop
 trajin ${nc}.nc 1 last $skip
 rmsd :1-${res}@CA,C,N first
 molsurf :1-${res} \
-    out sas.dat
+    out sasa.dat
+surf :TRP,TYR,MET,ALA,ILE,LEU,PHE,VAL,PRO,GLY&!@CA,C,O,N,H \
+    out sasa_nonpolar.dat
 run
 EOF
 
@@ -118,6 +120,48 @@ cluster rms :1-${res}@CA,C,N \
 run
 EOF
 
+cat << EOF > RADGYR.in
+parm ${prmtop}.prmtop
+trajin ${nc}.nc 1 last $skip
+rmsd :1-${res}@CA,C,N first
+radgyr :1-${res}@CA,C,N \
+    out radgyr.dat
+run
+EOF
+
+cat << EOF > PCA.in
+parm ${prmtop}.prmtop
+trajin ${nc}.nc 1 last $skip
+rmsd :1-${res}@CA,C,N,O first
+average crdset AVG
+createcrd TRAJ
+run
+crdaction TRAJ rmsd \
+    :1-${res}@CA,C,N,O \
+    ref AVG
+crdaction TRAJ matrix covar \
+    :1-${res}&!@H= \
+    name COVAR
+runanalysis diagmatrix COVAR \
+    vecs 3 name EVECS \
+    nmwiz nmwizvecs 3 nmwizfile evecs.nmd nmwizmask :1-${res}&!@H= \
+    out evecs.dat
+crdaction TRAJ projection PROJ \
+    :1-${res}&!@H= \
+    evecs EVECS \
+    beg 1 end 3
+hist norm name PROJ-1 \
+    PROJ:1 bins 100 \
+    out hist.dat
+hist norm name PROJ-2 \
+    PROJ:2 bins 100 \
+    out hist.dat
+hist norm name PROJ-3 \
+    PROJ:3 bins 100 \
+    out hist.dat
+run
+EOF
+
 # Redirect stdout and stderr to log
 exec > >(tee analyze.log) 2>&1
 
@@ -128,7 +172,29 @@ echo residues=$res
 # Run analysis
 cpptraj.OMP -i RMSD.in
 cpptraj.OMP -i RMSF.in
-cpptraj.OMP -i CONTACTS.in
-cpptraj.OMP -i SAS.in
-cpptraj.OMP -i HBONDS.in
+cpptraj.OMP -i RADGYR.in
+cpptraj.OMP -i SASA.in
+cpptraj.OMP -i PCA.in
 cpptraj.OMP -i CLUSTER.in
+cpptraj.OMP -i HBONDS.in
+cpptraj.OMP -i CONTACTS.in
+
+# Create trajectory of PCA
+PCMIN=$(awk 'FNR == 2 {print $1}' pca-hist.dat)
+PCMIN=$(echo "$PCMIN-5" | bc)
+
+PCMAX=$(awk 'END{print $1}' pca-hist.dat)
+PCMAX=$(echo "$PCMAX+5" | bc)
+
+cat << EOF > PCA-trajout.in
+readdata pca-evecs.dat name EVECS
+parm ${prmtop}.prmtop
+parmstrip !(:1-${res}&!@H=)
+parmwrite out ${prmtop}_PCA.prmtop
+runanalysis modes name EVECS \
+    pcmin $PCMIN pcmax $PCMAX tmode 1 \
+    trajoutmask :1-${res}&!@H= trajoutfmt netcdf \
+    trajout ${nc}_PCA.nc
+EOF
+
+cpptraj.OMP -i PCA-trajout.in
