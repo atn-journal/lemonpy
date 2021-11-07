@@ -1,14 +1,16 @@
 #!/bin/bash
 
-# Usage: ./runMD.sh -p {prmtop} -n {input_ns} -t {temperature} -i {ID}
+# Usage: ./runMD.sh -p {prmtop} -c {coord} -n {input_ns} -t {temperature} -i {ID}
 # Temperature must be an integer provided in K.
 # "input_ns" must be an integer.
+# Coordinates without extension! Only necessary if input_ns = 0.
 
 # Get topology, temperature and input ns
-while getopts :p:n:t:i: flag
+while getopts :p:c:n:t:i: flag
 do
     case "${flag}" in
         p) prmtop=$(basename ${OPTARG} .prmtop);;
+        c) coord=${OPTARG};;
         n) ns_in=${OPTARG};;
         t) temp=${OPTARG};;
         i) ID=${OPTARG};;
@@ -38,7 +40,6 @@ ns_out=$(($ns_in+50))
 
 if test $ns_in -eq 0
 then
-    coord=${prmtop}_eq
     output=${prmtop}_md00${ns_out}ns-${temp}K
 else
     coord=${prmtop}_md$(printf "%04d" $ns_in)ns-${temp}K
