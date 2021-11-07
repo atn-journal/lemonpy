@@ -18,6 +18,7 @@
 # Define basenames, input time, T (in K, integer), path (no trailing '/') and email
 prmtop='prmtop'
 ns_in='0'
+coord='coord'
 temp='temperature'
 path='path'
 ID='ID'
@@ -39,7 +40,6 @@ ns_out=$(($ns_in+50))
 
 if test $ns_in -eq 0
 then
-    coord=${prmtop}_eq
     output=${prmtop}_md00${ns_out}ns-${temp}K
 else
     coord=${prmtop}_md$(printf "%04d" $ns_in)ns-${temp}K
@@ -71,7 +71,6 @@ Molecular dynamics production of 50 ns
     cut=9.0,
     ntpr=500,ntwr=12500000,ntwx=5000,
   /
-
 EOF
 
 # RUN MD
