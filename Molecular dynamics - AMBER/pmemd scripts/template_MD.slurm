@@ -40,7 +40,7 @@ ns_out=$(($ns_in+50))
 
 if test $ns_in -eq 0
 then
-    output=${prmtop}_md00${ns_out}ns-${temp}K
+    output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
 else
     coord=${prmtop}_md$(printf "%04d" $ns_in)ns-${temp}K
     output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
