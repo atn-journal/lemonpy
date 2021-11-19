@@ -5,7 +5,6 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=40
 #SBATCH --gres=gpu:1
-#SBATCH --workdir=
 ##SBATCH --dependency=afterok:JOBID
 #SBATCH --output=%x.out
 
