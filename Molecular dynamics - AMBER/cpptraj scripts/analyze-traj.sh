@@ -175,9 +175,6 @@ cpptraj.OMP -i RMSF.in
 cpptraj.OMP -i RADGYR.in
 cpptraj.OMP -i SASA.in
 cpptraj.OMP -i PCA.in
-cpptraj.OMP -i CLUSTER.in
-cpptraj.OMP -i HBONDS.in
-cpptraj.OMP -i CONTACTS.in
 
 # Create trajectory of PCA
 PCMIN=$(awk 'FNR == 2 {print $1}' pca-hist.dat)
@@ -198,3 +195,8 @@ runanalysis modes name EVECS \
 EOF
 
 cpptraj.OMP -i PCA-trajout.in
+
+# Continue analysis
+cpptraj.OMP -i CLUSTER.in
+cpptraj.OMP -i HBONDS.in
+cpptraj.OMP -i CONTACTS.in
