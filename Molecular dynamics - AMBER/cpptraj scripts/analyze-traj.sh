@@ -144,21 +144,21 @@ crdaction TRAJ matrix covar \
     name COVAR
 runanalysis diagmatrix COVAR \
     vecs 3 name EVECS \
-    nmwiz nmwizvecs 3 nmwizfile evecs.nmd nmwizmask :1-${res}&!@H= \
-    out evecs.dat
+    nmwiz nmwizvecs 3 nmwizfile pca-evecs.nmd nmwizmask :1-${res}&!@H= \
+    out pca-evecs.dat
 crdaction TRAJ projection PROJ \
     :1-${res}&!@H= \
     evecs EVECS \
     beg 1 end 3
 hist norm name PROJ-1 \
     PROJ:1 bins 100 \
-    out hist.dat
+    out pca-hist.dat
 hist norm name PROJ-2 \
     PROJ:2 bins 100 \
-    out hist.dat
+    out pca-hist.dat
 hist norm name PROJ-3 \
     PROJ:3 bins 100 \
-    out hist.dat
+    out pca-hist.dat
 run
 EOF
 
