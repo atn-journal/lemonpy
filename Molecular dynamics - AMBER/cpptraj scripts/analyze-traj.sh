@@ -176,7 +176,7 @@ echo residues=$res
 cpptraj.OMP -i RMSD.in
 mv RMSD.in rmsd.dat rmsd-2d.dat -t rmsd
 cpptraj.OMP -i RMSF.in
-mv RMSF.in rmsf.dat ${prmtop}_Bfactor.pdb -t rmsd
+mv RMSF.in rmsf.dat ${prmtop}_Bfactor.pdb -t rmsf
 cpptraj.OMP -i RADGYR.in
 mv RADGYR.in radgyr.dat -t radgyr
 cpptraj.OMP -i SASA.in
