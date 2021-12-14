@@ -162,6 +162,9 @@ hist norm name PROJ-3 \
 run
 EOF
 
+# Create folders
+mkdir rmsd rmsf contacts sasa hbonds clusters radgyr pca
+
 # Redirect stdout and stderr to log
 exec > >(tee analyze.log) 2>&1
 
@@ -171,9 +174,13 @@ echo residues=$res
 
 # Run analysis
 cpptraj.OMP -i RMSD.in
+mv RMSD.in rmsd.dat rmsd-2d.dat -t rmsd
 cpptraj.OMP -i RMSF.in
+mv RMSF.in rmsf.dat ${prmtop}_Bfactor.pdb -t rmsd
 cpptraj.OMP -i RADGYR.in
+mv RADGYR.in radgyr.dat -t radgyr
 cpptraj.OMP -i SASA.in
+mv SASA.in sasa.dat sasa_nonpolar.dat -t sasa
 cpptraj.OMP -i PCA.in
 
 # Create trajectory of PCA
@@ -195,8 +202,12 @@ runanalysis modes name EVECS \
 EOF
 
 cpptraj.OMP -i PCA-trajout.in
+mv *pca* *PCA* -t pca
 
 # Continue analysis
 cpptraj.OMP -i CLUSTER.in
+mv CLUSTER.in cluster* -t clusters
 cpptraj.OMP -i HBONDS.in
+mv HBONDS.in hbonds* -t hbonds
 cpptraj.OMP -i CONTACTS.in
+mv CONTACTS.in *contacts* -t contacts
