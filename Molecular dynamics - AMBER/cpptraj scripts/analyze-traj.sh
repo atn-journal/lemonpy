@@ -198,7 +198,15 @@ parmwrite out ${prmtop}_PCA.prmtop
 runanalysis modes name EVECS \
     pcmin $PCMIN pcmax $PCMAX tmode 1 \
     trajoutmask :1-${res}&!@H= trajoutfmt netcdf \
-    trajout ${nc}_PCA.nc
+    trajout ${nc}_PCA1.nc
+runanalysis modes name EVECS \
+    pcmin $PCMIN pcmax $PCMAX tmode 2 \
+    trajoutmask :1-${res}&!@H= trajoutfmt netcdf \
+    trajout ${nc}_PCA2.nc
+runanalysis modes name EVECS \
+    pcmin $PCMIN pcmax $PCMAX tmode 3 \
+    trajoutmask :1-${res}&!@H= trajoutfmt netcdf \
+    trajout ${nc}_PCA3.nc
 EOF
 
 cpptraj.OMP -i PCA-trajout.in
