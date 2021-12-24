@@ -1,17 +1,9 @@
 #!/usr/bin/env bash
 
-# Usage: ./equilibrate.sh -p {prmtop} -c {coordinates} -t {temperature}
-# Temperature must be an integer provided in K.
-
 # Get topology, coordinates and temperature
-while getopts :p:c:t: flag
-do
-    case "${flag}" in
-        p) prmtop=$(basename ${OPTARG} .prmtop);;
-        c) coord=$(basename ${OPTARG} .rst);;
-        t) temp=${OPTARG};;
-    esac
-done
+prmtop=''
+coord=''
+temp=
 
 # Create equilibration input file
 cat << EOF > eq.in
@@ -20,7 +12,7 @@ P = 1 bar and coupling = 0.2 ps.
   &cntrl
     ntx=5,irest=1,
     t=0.0,dt=0.002,nstlim=250000,
-    temp0=${temp}.0,ntt=3,ig=-1,gamma_ln=5.0,
+    temp0=${temp},ntt=3,ig=-1,gamma_ln=5.0,
     pres0=1.0,ntp=1,barostat=1,taup=0.2,
     ntc=2,ntf=2,
     nscm=5000,
@@ -46,8 +38,3 @@ echo -e "##################################################\n"
 
 # Stop redirection to log
 exec 1>&3 2>&4
-
-# Display results in VMD
-#vmd ${prmtop}.prmtop ${prmtop}_eq.nc
-
-#send-email.py "Terminó ${prmtop}_eq_${temp}K"

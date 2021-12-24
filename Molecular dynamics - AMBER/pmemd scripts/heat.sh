@@ -1,18 +1,10 @@
 #!/usr/bin/env bash
 
-# Usage: ./heat.sh -p {prmtop} -c {coordinates} -r {residues} -t {temperature}
-# Temperature must be an integer provided in K.
-
 # Get topology, coordinates, number of residues and target temperature
-while getopts :p:c:r:t: flag
-do
-    case "${flag}" in
-        p) prmtop=$(basename ${OPTARG} .prmtop);;
-        c) coord=$(basename ${OPTARG} .rst);;
-        r) res=${OPTARG};;
-        t) temp=${OPTARG};;
-    esac
-done
+prmtop=''
+coord=''
+res=
+temp=
 
 # Create heating input file
 cat << EOF > heat.in
@@ -31,12 +23,12 @@ V = const.
   &wt
     type='TEMP0',
     istep1=0,istep2=5000,
-    value1=100.0,value2=${temp}.0,
+    value1=100.0,value2=${temp},
   /
   &wt
     type='TEMP0',
     istep1=5001,istep2=50000,
-    value1=${temp}.0,value2=${temp}.0,
+    value1=${temp},value2=${temp},
   /
   &wt type='END',
   /
@@ -60,8 +52,3 @@ echo -e "##################################################\n"
 
 # Stop redirection to log
 exec 1>&3 2>&4
-
-# Display results in VMD
-#vmd ${prmtop}.prmtop ${prmtop}_heat.nc
-
-#send-email.py "Terminó ${prmtop}_heat_${temp}K"

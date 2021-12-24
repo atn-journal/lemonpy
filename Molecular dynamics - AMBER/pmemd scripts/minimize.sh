@@ -1,15 +1,8 @@
 #!/usr/bin/env bash
 
-# Usage: ./minimize.sh -p {prmtop} -r {residues}
-
 # Get topology and number of residues
-while getopts :p:r: flag
-do
-    case "${flag}" in
-        p) prmtop=$(basename ${OPTARG} .prmtop);;
-        r) res=${OPTARG};;
-    esac
-done
+prmtop=''
+res=
 
 # Create minimization input files
 cat << EOF > min1.in
@@ -68,8 +61,3 @@ echo -e "##################################################\n"
 
 # Stop redirection to log
 exec 1>&3 2>&4
-
-# Display results in VMD
-#vmd ${prmtop}.prmtop -netcdf ${prmtop}_min1.rst -netcdf ${prmtop}_min2.rst -netcdf ${prmtop}_min3.rst
-
-#send-email.py "Terminó ${prmtop}_min3"
