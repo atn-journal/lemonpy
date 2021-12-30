@@ -78,30 +78,34 @@ tail -n 18 $path/$output.out
 echo -e "############################################################\n"
 
 ####################################################################################
-# Re-define names
-coord=$output
-ns_in=$ns_out
-ns_out=$(($ns_in+50))
-output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
 
-echo new input=$coord
-echo new output=$output
+for((i=0;i<1;i++));
+do
+  # Re-define names
+  coord=$output
+  ns_in=$ns_out
+  ns_out=$(($ns_in+50))
+  output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
 
-# Move files to scratch
-cp $path/{md.in,${prmtop}.prmtop,${coord}.rst} $NVME1DIR/
+  echo new input=$coord
+  echo new output=$output
 
-# RUN MD
-echo -e "\n##################################################"
-date
-echo "Running $output"
-echo -e "##################################################\n"
-pmemd.cuda -O -i md.in -o ${output}.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
+  # Move files to scratch
+  cp $path/{md.in,${prmtop}.prmtop,${coord}.rst} $NVME1DIR/
 
-# Recover files and remove from scratch
-cp $NVME1DIR/* $path/
+  # RUN MD
+  echo -e "\n##################################################"
+  date
+  echo "Running $output"
+  echo -e "##################################################\n"
+  pmemd.cuda -O -i md.in -o ${output}.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
 
-echo -e "\n############################################################"
-date
-echo "$output finished"
-tail -n 18 $path/$output.out
-echo -e "############################################################\n"
+  # Recover files and remove from scratch
+  cp $NVME1DIR/* $path/
+
+  echo -e "\n############################################################"
+  date
+  echo "$output finished"
+  tail -n 18 $path/$output.out
+  echo -e "############################################################\n"
+done
