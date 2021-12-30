@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# Check mdinfo on running job
+
+cd $NVME1DIR
+cat *mdinfo

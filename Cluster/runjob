@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Connect to job-id node
+
+srun --jobid=$1 --pty bash -l
