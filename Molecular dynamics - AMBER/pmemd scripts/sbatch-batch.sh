@@ -6,8 +6,8 @@ ns_in=2700
 ns_slurm=100
 
 ns_out=$(($ns_in+$ns_slurm))
-file="$ID-${ns_in}ns"
-output="$ID-${ns_out}ns"
+file="$ID-$(printf "%04d" $ns_in)ns"
+output="$ID-$(printf "%04d" $ns_out)ns"
 
 sed -r "s/#SBATCH --job-name=.*/#SBATCH --job-name=$output/" $file.slurm > $output.slurm
 sed -r -i "s/#*SBATCH --dependency=afterok:.*/#SBATCH --dependency=afterok:$dependency/" $output.slurm
@@ -21,8 +21,8 @@ for((i=0;i<1;i++));
 do
     ns_in=$ns_out
     ns_out=$(($ns_in+$ns_slurm))
-    file="$ID-${ns_in}ns"
-    output="$ID-${ns_out}ns"
+    file="$ID-$(printf "%04d" $ns_in)ns"
+    output="$ID-$(printf "%04d" $ns_out)ns"
 
     sed -r "s/#SBATCH --job-name=.*/#SBATCH --job-name=$output/" $file.slurm > $output.slurm
     sed -r -i "s/#*SBATCH --dependency=afterok:.*/#SBATCH --dependency=afterok:$dependency/" $output.slurm
