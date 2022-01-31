@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+var=$(sudo lsblk | grep 3,7T | awk '{print $1}')
+sudo mount /dev/$var /media/atijman/HDD
