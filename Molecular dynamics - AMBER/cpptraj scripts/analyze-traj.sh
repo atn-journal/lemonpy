@@ -1,60 +1,51 @@
 #!/usr/bin/env bash
 
-# Usage: ./analyze-traj.sh -p {prmtop} -t {trajectory} -r {residues}
+prmtop=''
+nc=''
+res=
 
-# Get topology, trajectory and number of residues
-while getopts :p:t:r: flag
-do
-    case "${flag}" in
-        p) prmtop=$(basename ${OPTARG} .prmtop);;
-        t) nc=$(basename ${OPTARG} .nc);;
-        r) res=${OPTARG};;
-    esac
-done
-
+from=1001
 skip=1
 
 # Write out scripts for analysis
 cat << EOF > RMSD.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last $skip
-rmsd :1-${res}@CA,C,N \
+trajin ${nc}.nc $from last $skip
+rmsd :1-${res}@CA \
     first \
-    mass \
     out rmsd.dat
-rms2d :1-${res}@CA,C,N \
-    mass \
+rms2d :1-${res}@CA \
     out rmsd-2d.dat
 EOF
 
 cat << EOF > RMSF.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last $skip
-rmsd :1-${res}@CA,C,N first
-trajout ${prmtop}_Bfactor.pdb pdb stop 1
+trajin ${nc}.nc $from last $skip
+rmsd :1-$((${res}/2))@CA first
+trajout ${prmtop}-Bfactor-chainA.pdb pdb stop 1
 run
-average :1-${res}@CA,C,N \
+average :1-$((${res}/2))@CA \
     crdset AVG
 run
-rmsd :1-${res}@CA,C,N \
+rmsd :1-$((${res}/2))@CA \
     ref AVG
-rmsf :1-${res}@CA,C,N \
+rmsf :1-$((${res}/2))@CA \
     byres \
-    out rmsf.dat
+    out rmsf-chainA.dat
 run
-rmsf Bfactor :1-${res}@CA,C,N \
+rmsf Bfactor :1-$((${res}/2))@CA \
     bfactor
 run
-loadcrd ${prmtop}_Bfactor.pdb PDB
-crdout PDB ${prmtop}_Bfactor.pdb \
+loadcrd ${prmtop}-Bfactor-chainA.pdb PDB
+crdout PDB ${prmtop}-Bfactor-chainA.pdb \
     bfacdata Bfactor
 run
 EOF
 
 cat << EOF > CONTACTS.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last $skip
-rmsd :1-${res}@CA,C,N first
+trajin ${nc}.nc $from last $skip
+rmsd :1-${res}@CA first
 nativecontacts :1-${res} \
     byresidue resoffset 4 \
     writecontacts contacts_native.dat \
@@ -89,8 +80,8 @@ EOF
 
 cat << EOF > SASA.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last $skip
-rmsd :1-${res}@CA,C,N first
+trajin ${nc}.nc $from last $skip
+rmsd :1-${res}@CA first
 molsurf :1-${res} \
     out sasa.dat
 surf :TRP,TYR,MET,ALA,ILE,LEU,PHE,VAL,PRO,GLY&!@CA,C,O,N,H \
@@ -100,8 +91,8 @@ EOF
 
 cat << EOF > HBONDS.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last $skip
-rmsd :1-${res}@CA,C,N first
+trajin ${nc}.nc $from last $skip
+rmsd :1-${res}@CA first
 hbond :1-${res} \
     avgout hbonds_avg.dat printatomnum \
     series uuseries hbonds_series.dat
@@ -110,8 +101,8 @@ EOF
 
 cat << EOF > CLUSTER.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last $skip
-cluster rms :1-${res}@CA,C,N \
+trajin ${nc}.nc $from last $skip
+cluster rms :1-${res}@CA \
     sieve 10 \
     summary clusters.dat \
     cpopvtime cluster-population-vs-time.dat normframe \
@@ -122,22 +113,22 @@ EOF
 
 cat << EOF > RADGYR.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last $skip
-rmsd :1-${res}@CA,C,N first
-radgyr :1-${res}@CA,C,N \
+trajin ${nc}.nc $from last $skip
+rmsd :1-${res}@CA first
+radgyr :1-${res}@CA \
     out radgyr.dat
 run
 EOF
 
 cat << EOF > PCA.in
 parm ${prmtop}.prmtop
-trajin ${nc}.nc 1 last $skip
-rmsd :1-${res}@CA,C,N,O first
+trajin ${nc}.nc $from last $skip
+rmsd :1-${res}@CA first
 average crdset AVG
 createcrd TRAJ
 run
 crdaction TRAJ rmsd \
-    :1-${res}@CA,C,N,O \
+    :1-${res}@CA \
     ref AVG
 crdaction TRAJ matrix covar \
     :1-${res}&!@H= \
@@ -210,12 +201,12 @@ runanalysis modes name EVECS \
 EOF
 
 cpptraj.OMP -i PCA-trajout.in
-mv *pca* *PCA* -t pca
+mv PCA.in pca-evecs.dat pca-evecs.nmd pca-hist.dat PCA-trajout.in ${prmtop}.prmtop  ${nc}_PCA?.nc-t pca
 
 # Continue analysis
 cpptraj.OMP -i CLUSTER.in
-mv CLUSTER.in cluster* -t clusters
+mv CLUSTER.in cluster.c*.pdb cluster-population-vs-time.dat clusters.dat clusters.nc -t clusters
 cpptraj.OMP -i HBONDS.in
-mv HBONDS.in hbonds* -t hbonds
+mv HBONDS.in hbonds_avg.dat hbonds_series.dat -t hbonds
 cpptraj.OMP -i CONTACTS.in
-mv CONTACTS.in *contacts* -t contacts
+mv CONTACTS.in contacts*.* native.contacts* nonnative.contacts* -t contacts
