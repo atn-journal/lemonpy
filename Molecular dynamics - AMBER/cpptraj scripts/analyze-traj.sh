@@ -198,7 +198,7 @@ runanalysis modes name EVECS \
 EOF
 
 cpptraj.OMP -i PCA-trajout.in
-mv PCA.in pca-evecs.dat pca-evecs.nmd pca-hist.dat PCA-trajout.in ${prmtop}-PCA.prmtop  ${nc}-PCA?.nc-t pca
+mv PCA.in pca-evecs.dat pca-evecs.nmd pca-hist.dat PCA-trajout.in ${prmtop}-PCA.prmtop  ${nc}-PCA?.nc -t pca
 
 # Continue analysis
 cpptraj.OMP -i CLUSTER.in
