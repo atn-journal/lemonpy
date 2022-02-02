@@ -3,14 +3,13 @@
 prmtop=''
 nc=''
 res=
-
 from=1001
 skip=1
 
 # Write out scripts for analysis
 cat << EOF > RMSD.in
-parm ${prmtop}.prmtop
-trajin ${nc}.nc $from last $skip
+parm ../${prmtop}.prmtop
+trajin ../${nc}.nc $from last $skip
 rmsd :1-${res}@CA \
     first \
     out rmsd.dat
@@ -19,8 +18,8 @@ rms2d :1-${res}@CA \
 EOF
 
 cat << EOF > RMSF.in
-parm ${prmtop}.prmtop
-trajin ${nc}.nc $from last $skip
+parm ../${prmtop}.prmtop
+trajin ../${nc}.nc $from last $skip
 rmsd :1-${res}@CA first
 trajout ${prmtop}-Bfactor.pdb pdb onlyframes 1
 run
@@ -41,8 +40,8 @@ run
 EOF
 
 cat << EOF > CONTACTS.in
-parm ${prmtop}.prmtop
-trajin ${nc}.nc $from last $skip
+parm ../${prmtop}.prmtop
+trajin ../${nc}.nc $from last $skip
 rmsd :1-${res}@CA first
 nativecontacts :1-${res} \
     byresidue resoffset 4 \
@@ -77,8 +76,8 @@ run
 EOF
 
 cat << EOF > SASA.in
-parm ${prmtop}.prmtop
-trajin ${nc}.nc $from last $skip
+parm ../${prmtop}.prmtop
+trajin ../${nc}.nc $from last $skip
 rmsd :1-${res}@CA first
 molsurf :1-${res} \
     out sasa.dat
@@ -88,8 +87,8 @@ run
 EOF
 
 cat << EOF > HBONDS.in
-parm ${prmtop}.prmtop
-trajin ${nc}.nc $from last $skip
+parm ../${prmtop}.prmtop
+trajin ../${nc}.nc $from last $skip
 rmsd :1-${res}@CA first
 hbond :1-${res} \
     avgout hbonds_avg.dat printatomnum \
@@ -98,8 +97,8 @@ run
 EOF
 
 cat << EOF > CLUSTER.in
-parm ${prmtop}.prmtop
-trajin ${nc}.nc $from last $skip
+parm ../${prmtop}.prmtop
+trajin ../${nc}.nc $from last $skip
 cluster rms :1-${res}@CA \
     sieve 10 \
     summary clusters.dat \
@@ -110,8 +109,8 @@ run
 EOF
 
 cat << EOF > RADGYR.in
-parm ${prmtop}.prmtop
-trajin ${nc}.nc $from last $skip
+parm ../${prmtop}.prmtop
+trajin ../${nc}.nc $from last $skip
 rmsd :1-${res}@CA first
 radgyr :1-${res}@CA \
     out radgyr.dat
@@ -119,8 +118,8 @@ run
 EOF
 
 cat << EOF > PCA.in
-parm ${prmtop}.prmtop
-trajin ${nc}.nc $from last $skip
+parm ../${prmtop}.prmtop
+trajin ../${nc}.nc $from last $skip
 rmsd :1-${res}@CA first
 average crdset AVG
 createcrd TRAJ
@@ -165,7 +164,7 @@ echo residues=$res
 cpptraj.OMP -i RMSD.in
 mv RMSD.in rmsd.dat rmsd-2d.dat -t rmsd
 cpptraj.OMP -i RMSF.in
-mv RMSF.in rmsf.dat ${prmtop}_Bfactor.pdb -t rmsf
+mv RMSF.in rmsf.dat ${prmtop}-Bfactor.pdb -t rmsf
 cpptraj.OMP -i RADGYR.in
 mv RADGYR.in radgyr.dat -t radgyr
 cpptraj.OMP -i SASA.in
@@ -181,25 +180,25 @@ PCMAX=$(echo "$PCMAX+5" | bc)
 
 cat << EOF > PCA-trajout.in
 readdata pca-evecs.dat name EVECS
-parm ${prmtop}.prmtop
+parm ../${prmtop}.prmtop
 parmstrip !(:1-${res}&!@H=)
-parmwrite out ${prmtop}_PCA.prmtop
+parmwrite out ${prmtop}-PCA.prmtop
 runanalysis modes name EVECS \
     pcmin $PCMIN pcmax $PCMAX tmode 1 \
     trajoutmask :1-${res}&!@H= trajoutfmt netcdf \
-    trajout ${nc}_PCA1.nc
+    trajout ${nc}-PCA1.nc
 runanalysis modes name EVECS \
     pcmin $PCMIN pcmax $PCMAX tmode 2 \
     trajoutmask :1-${res}&!@H= trajoutfmt netcdf \
-    trajout ${nc}_PCA2.nc
+    trajout ${nc}-PCA2.nc
 runanalysis modes name EVECS \
     pcmin $PCMIN pcmax $PCMAX tmode 3 \
     trajoutmask :1-${res}&!@H= trajoutfmt netcdf \
-    trajout ${nc}_PCA3.nc
+    trajout ${nc}-PCA3.nc
 EOF
 
 cpptraj.OMP -i PCA-trajout.in
-mv PCA.in pca-evecs.dat pca-evecs.nmd pca-hist.dat PCA-trajout.in ${prmtop}.prmtop  ${nc}_PCA?.nc-t pca
+mv PCA.in pca-evecs.dat pca-evecs.nmd pca-hist.dat PCA-trajout.in ${prmtop}-PCA.prmtop  ${nc}-PCA?.nc-t pca
 
 # Continue analysis
 cpptraj.OMP -i CLUSTER.in
