@@ -21,24 +21,22 @@ EOF
 cat << EOF > RMSF.in
 parm ${prmtop}.prmtop
 trajin ${nc}.nc $from last $skip
-rmsd :1-$((${res}/2))@CA first
-trajout ${prmtop}-Bfactor-chainA.pdb pdb stop 1
+rmsd :1-${res}@CA first
+trajout ${prmtop}-Bfactor.pdb pdb onlyframes 1
 run
-average :1-$((${res}/2))@CA \
+average :1-${res}@CA \
     crdset AVG
 run
-rmsd :1-$((${res}/2))@CA \
+rmsd :1-${res}@CA \
     ref AVG
-rmsf :1-$((${res}/2))@CA \
+rmsf :1-${res}@CA \
     byres \
-    out rmsf-chainA.dat
+    out rmsf.dat
 run
-rmsf Bfactor :1-$((${res}/2))@CA \
-    bfactor
-run
-loadcrd ${prmtop}-Bfactor-chainA.pdb PDB
-crdout PDB ${prmtop}-Bfactor-chainA.pdb \
-    bfacdata Bfactor
+readdata rmsf.dat name RMSF
+loadcrd ${prmtop}-Bfactor.pdb PDB
+crdout PDB ${prmtop}-Bfactor.pdb \
+    bfacdata RMSF:2 bfacbyres
 run
 EOF
 
