@@ -1,21 +1,10 @@
 #!/bin/bash
 
-# Usage: ./runMD.sh -p {prmtop} -c {coord} -n {input_ns} -t {temperature} -i {ID}
-# Temperature must be an integer provided in K.
-# "input_ns" must be an integer.
-# Coordinates without extension! Only necessary if input_ns = 0.
-
-# Get topology, temperature and input ns
-while getopts :p:c:n:t:i: flag
-do
-    case "${flag}" in
-        p) prmtop=$(basename ${OPTARG} .prmtop);;
-        c) coord=${OPTARG};;
-        n) ns_in=${OPTARG};;
-        t) temp=${OPTARG};;
-        i) ID=${OPTARG};;
-    esac
-done
+prmtop=''
+coord=''
+ns_in=''
+temp=''
+ID=''
 
 # Create MD input file
 cat << EOF > md.in
@@ -40,10 +29,10 @@ ns_out=$(($ns_in+50))
 
 if test $ns_in -eq 0
 then
-    output=${prmtop}_md00${ns_out}ns-${temp}K
+    output=${prmtop}-md00${ns_out}ns-${temp}K
 else
-    coord=${prmtop}_md$(printf "%04d" $ns_in)ns-${temp}K
-    output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
+    coord=${prmtop}-md$(printf "%04d" $ns_in)ns-${temp}K
+    output=${prmtop}-md$(printf "%04d" $ns_out)ns-${temp}K
 fi
 
 # Redirect stdout and stderr to log
@@ -71,31 +60,32 @@ tail -n 18 $output.out
 echo -e "############################################################\n"
 
 #################################################################################################
-# Re-define variables
-coord=$output
-ns_in=$ns_out
-ns_out=$(($ns_in+50))
-output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
 
-# Print variables
-echo input=$coord
-echo output=$output
+for((i=0;i<1;i++));
+do
+  # Re-define names
+  coord=$output
+  ns_in=$ns_out
+  ns_out=$(($ns_in+50))
+  output=${prmtop}-md$(printf "%04d" $ns_out)ns-${temp}K
 
-echo -e "\n##################################################"
-date
-echo "Running $output"
-echo -e "##################################################\n"
+  echo new input=$coord
+  echo new output=$output
 
-# RUN MD
-pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
+  echo -e "\n##################################################"
+  date
+  echo "Running $output"
+  echo -e "##################################################\n"
 
-send-email.py "Run $output from $ID finished in $host"
+  # RUN MD
+  pmemd.cuda -O -i md.in -o $output.out -p $prmtop.prmtop -c $coord.rst -r $output.rst -x $output.nc -inf $output.mdinfo
 
-echo -e "\n############################################################"
-date
-echo "$output finished"
-tail -n 18 $output.out
-echo -e "############################################################\n"
+  echo -e "\n############################################################"
+  date
+  echo "$output finished"
+  tail -n 18 $output.out
+  echo -e "############################################################\n"
+done
 
 # Stop redirection to log
 exec 1>&3 2>&4
