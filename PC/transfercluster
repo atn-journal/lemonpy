@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Usage: transfercluster {source} {destination}
+
+rsync -vhhPaz --info=progress2 -n $1 $2
+
+echo 'Press Enter to continue'
+read x
+
+rsync -vhhPaz --info=progress2 $1 $2
