@@ -13,8 +13,8 @@
 #######################################################################
 # Define topology, T (in K, integer), path (no trailing '/') and email
 prmtop='prmtop'
-temp='temperature'
-skip_frames='skip'
+temp=
+skip_frames=1
 email='@'
 #######################################################################
 #######################################################################
@@ -37,8 +37,8 @@ cat << EOF > join.in
 parm ${prmtop}.prmtop
 trajin *md*ns-${temp}K.nc 1 last $skip_frames
 autoimage
-strip :WAT,Na+,Cl- parmout ${prmtop}_dry.prmtop
-trajout ${prmtop}_md1us-${temp}K_dry.nc netcdf
+strip :WAT,Na+,Cl- parmout ${prmtop}-dry.prmtop
+trajout ${prmtop}-md4us-${temp}K-dry-c10ps.nc netcdf
 run
 EOF
 
