@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# Display queue
+
+squeue -u atijman --format="%.10i %.9P %.25j %.2t %.10M %.6D %R" --sort j
