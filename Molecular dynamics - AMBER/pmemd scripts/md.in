@@ -49,8 +49,8 @@ Molecular dynamics production of 50 ns
 
     # Save energy information in mdout and mdinfo every ntpr steps (default=50).
     ntpr=500,
-    # Write restart file every ntwr steps (default=nstlim or maxcyc). If set < 0, write unique files every abs(ntwr) steps. Ideally > 100 000.
-    ntwr=12500000,
+    # Write restart file every ntwr steps (default=nstlim or maxcyc). If set < 0, write unique files every abs(ntwr) steps. Ideally > 100 000. Set at every 1 ns.
+    ntwr=500000,
     # Write coordinates to trajectory file every ntwx steps (default=0)
     ntwx=500,
   /

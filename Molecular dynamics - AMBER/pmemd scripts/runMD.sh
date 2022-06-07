@@ -18,7 +18,7 @@ Molecular dynamics production of 50 ns
     iwrap=1,
     nscm=5000,
     cut=9.0,
-    ntpr=500,ntwr=12500000,ntwx=5000,
+    ntpr=500,ntwr=500000,ntwx=5000,
   /
 EOF
 
