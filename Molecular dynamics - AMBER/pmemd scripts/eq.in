@@ -1,5 +1,5 @@
 # Arbitrary number of comments.
-Equilibrating the system during 5000 ps at constant T, P = 1 bar and coupling = 0.2 ps.
+Equilibrating the system during 500 ps at constant T, P = 1 bar and coupling = 0.2 ps.
   # " &cntrl" starts namelist block and is always required. The first character on each line of a namelist block must be a blank.
   &cntrl
     # Read only coordinates (1, default) or coord. and velocities (5) from inpcrd file.

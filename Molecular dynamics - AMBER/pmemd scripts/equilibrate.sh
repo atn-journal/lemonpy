@@ -7,7 +7,7 @@ temp=
 
 # Create equilibration input file
 cat << EOF > eq.in
-Equilibrating the system during 5000 ps at constant T,
+Equilibrating the system during 500 ps at constant T,
 P = 1 bar and coupling = 0.2 ps.
   &cntrl
     ntx=5,irest=1,
