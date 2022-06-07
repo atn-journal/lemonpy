@@ -1,28 +1,26 @@
 #!/bin/bash
-#SBATCH --job-name=ID-Xns
+#SBATCH --job-name=ID-0050ns
 #SBATCH --time=5-00:00:00
-#SBATCH --tmp=40G
-#SBATCH --mail-user=a@gmail.com
+#SBATCH --mail-user=ariel.tijman@gmail.com
 ##SBATCH --dependency=afterok:JOBID
 #SBATCH --partition=normal
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --qos=gpu
 #SBATCH --gres=gpu:1
-##SBATCH --exclude=node[15-17,23-28,31]
 #SBATCH --mail-type=FAIL
 #SBATCH --output=%x.out
 
 ####################################################################################
 ####################################################################################
-# Define basenames, input time, T (in K, integer), path (no trailing '/') and email
-prmtop='prmtop'
-ns_in='0'
-coord='coord'
-temp='temperature'
-path='path'
-ID='ID'
-email='@'
+# Define variables
+prmtop=''
+ns_in=0
+ns_end=4000
+coord=''
+temp=
+ID=''
+email='ariel.tijman@gmail.com'
 ####################################################################################
 ####################################################################################
 
@@ -36,6 +34,7 @@ source /etc/profile.d/modules.sh
 module use /clusteruy/home03/biosim_ip/modulefiles
 module load amber18-tools19
 
+# Define initial names
 ns_out=$(($ns_in+50))
 
 if test $ns_in -eq 0
@@ -49,13 +48,21 @@ fi
 echo topology=$prmtop
 echo input=$coord
 echo output=$output
-echo path=$path
 echo ID=$ID
 
-# Move files to scratch
-mkdir -p /scratch/$USER/$SLURM_JOB_ID
-cp ${path}/{${prmtop}.prmtop,${coord}.rst} /scratch/$USER/$SLURM_JOBID/
-cd /scratch/$USER/$SLURM_JOB_ID
+# Prepare next run
+next="$ID-$(printf "%04d" $(($ns_out+50)))ns"
+
+if test $(($ns_out+50)) -lt $ns_end
+then
+  cp $SLURM_JOB_NAME.slurm $next.slurm
+
+  sed -r -i "s/^#SBATCH --job-name=.*/#SBATCH --job-name=$next/" $next.slurm
+  sed -r -i "s/^#*SBATCH --dependency=afterok:.*/#SBATCH --dependency=afterok:$SLURM_JOB_ID/" $next.slurm
+  sed -r -i "s/^ns_in=.*/ns_in=$ns_out/" $next.slurm
+
+  sbatch $next.slurm
+fi
 
 # Create MD input file
 cat << EOF > md.in
@@ -69,7 +76,7 @@ Molecular dynamics production of 50 ns
     iwrap=1,
     nscm=5000,
     cut=9.0,
-    ntpr=500,ntwr=12500000,ntwx=5000,
+    ntpr=500,ntwr=500000,ntwx=5000,
   /
 EOF
 
@@ -78,47 +85,21 @@ echo -e "\n##################################################"
 date
 echo "Running $output"
 echo -e "##################################################\n"
-pmemd.cuda -O -i md.in -o ${output}.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
-
-# Recover files and remove from scratch
-cp /scratch/$USER/$SLURM_JOB_ID/* $path/
-rm -rf /scratch/$USER/$SLURM_JOB_ID/*
+pmemd.cuda -O -i md.in -p ${prmtop}.prmtop -c ${coord}.rst -o ${output}.out -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
 
 echo -e "\n############################################################"
 date
 echo "$output finished"
-tail -n 18 $path/$output.out
+tail -n 18 $output.out
 echo -e "############################################################\n"
 
-####################################################################################
-# Re-define names
-coord=$output
-ns_in=$ns_out
-ns_out=$(($ns_in+50))
-output=${prmtop}_md$(printf "%04d" $ns_out)ns-${temp}K
+# End tasks
+FILE=./${output}.out
 
-echo new input=$coord
-echo new output=$output
-
-# Move files to scratch
-cp $path/{md.in,${prmtop}.prmtop,${coord}.rst} /scratch/$USER/$SLURM_JOBID/
-
-# RUN MD
-echo -e "\n##################################################"
-date
-echo "Running $output"
-echo -e "##################################################\n"
-pmemd.cuda -O -i md.in -o ${output}.out -p ${prmtop}.prmtop -c ${coord}.rst -r ${output}.rst -x ${output}.nc -inf ${output}.mdinfo
-
-# Recover files and remove from scratch
-cp /scratch/$USER/$SLURM_JOB_ID/* $path/
-rm -rf /scratch/$USER/$SLURM_JOB_ID
-
-# Send email
-echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
-
-echo -e "\n############################################################"
-date
-echo "$output finished"
-tail -n 18 $path/$output.out
-echo -e "############################################################\n"
+if grep -q "Final Performance Info" "$FILE"
+then
+  echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
+else
+  echo -e "Subject: Run $output from $ID FAILED in ClusterUY" | sendmail $email
+  scancel -n $next
+fi
