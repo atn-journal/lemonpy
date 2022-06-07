@@ -1,5 +1,5 @@
 # Arbitrary number of comments.
-Heating the system with 5 kcal/mol restraints on PROTEIN, V = const.
+Heating the system with 5 kcal/mol restraints on PROTEIN, V = const., 100 ps
   # " &cntrl" starts namelist block and is always required. The first character on each line of a namelist block must be a blank.
   &cntrl
     # Starting time in ps (default=0.0)

@@ -9,7 +9,7 @@ temp=
 # Create heating input file
 cat << EOF > heat.in
 Heating the system with 5 kcal/mol restraints on PROTEIN,
-V = const.
+V = const., 100 ps
   &cntrl
     t=0.0,dt=0.002,nstlim=50000,
     ntr=1,restraintmask=':1-${res}',restraint_wt=5.0,
