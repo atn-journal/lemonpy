@@ -16,7 +16,7 @@
 # Define variables
 prmtop=''
 ns_in=0
-ns_end=4000
+ns_end=500
 coord=''
 temp=
 ID=''
@@ -53,8 +53,9 @@ echo ID=$ID
 # Prepare next run
 next="$ID-$(printf "%04d" $(($ns_out+50)))ns"
 
-if test $(($ns_out+50)) -lt $ns_end
+if test $(($ns_out+50)) -le $ns_end
 then
+  last=false
   cp $SLURM_JOB_NAME.slurm $next.slurm
 
   sed -r -i "s/^#SBATCH --job-name=.*/#SBATCH --job-name=$next/" $next.slurm
@@ -62,6 +63,8 @@ then
   sed -r -i "s/^ns_in=.*/ns_in=$ns_out/" $next.slurm
 
   sbatch $next.slurm
+else
+  last=true
 fi
 
 # Create MD input file
@@ -98,8 +101,11 @@ FILE=./${output}.out
 
 if grep -q "Final Performance Info" "$FILE"
 then
-  echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
+  if [ "$last" = true ]
+  then
+    echo -e "Subject: Run $output from $ID finished in ClusterUY" | sendmail $email
+  fi
 else
-  echo -e "Subject: Run $output from $ID FAILED in ClusterUY" | sendmail $email
+  echo -e "Subject: FAILED run $output from $ID in ClusterUY" | sendmail $email
   scancel -n $next
 fi
