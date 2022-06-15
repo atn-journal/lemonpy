@@ -1,26 +1,26 @@
 #!/bin/bash
-#SBATCH --job-name=ID-join-1us-traj
+#SBATCH --job-name=ID-postrun
 #SBATCH --time=10:00:00
-#SBATCH --mail-user=a@gmail.com
 #SBATCH --partition=normal
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 #SBATCH --qos=normal
+#SBATCH --mail-user=ariel.tijman@gmail.com
 #SBATCH --mail-type=FAIL
 #SBATCH --output=%x.out
 
 #######################################################################
 #######################################################################
-# Define topology, T (in K, integer), path (no trailing '/') and email
-prmtop='prmtop'
+# Define variables
+prmtop=''
 temp=
-skip_frames=1
-email='@'
+ns=
 #######################################################################
 #######################################################################
 
 echo job_ID=$SLURM_JOB_ID
 hostname
+email=`grep -m 1 mail-user $SLURM_JOB_NAME.slurm | cut -d = -f2`
 
 # Load modules
 source /etc/profile.d/modules.sh
@@ -30,20 +30,37 @@ module use /clusteruy/home03/biosim_ip/modulefiles
 module load amber18-tools19
 
 echo topology=$prmtop
-echo ID=$ID
 
-# Write out script
-cat << EOF > join.in
+# Write out scripts
+cat << EOF > postrun1.in
 parm ${prmtop}.prmtop
-trajin *md*ns-${temp}K.nc 1 last $skip_frames
+trajin *md*ns-${temp}K.nc
 autoimage
 strip :WAT,Na+,Cl- parmout ${prmtop}-dry.prmtop
-trajout ${prmtop}-md4us-${temp}K-dry-c10ps.nc netcdf
+trajout ${prmtop}-md${ns}ns-${temp}K-dry-c10ps.nc netcdf
 run
 EOF
 
-# Execute script
-cpptraj -i join.in
+cat << EOF > postrun2.in
+parm ${prmtop}-dry.prmtop
+trajin ${prmtop}-md${ns}ns-${temp}K-dry-c10ps.nc 1 last 100
+autoimage
+trajout ${prmtop}-md${ns}ns-${temp}K-dry-c1000ps.nc netcdf
+run
+EOF
 
-# Send email
-echo -e "Subject: Run $SLURM_JOB_NAME finished in ClusterUY" | sendmail $email
+# Execute scripts and notify
+cpptraj -i postrun1.in
+
+if [ $? -eq 0 ]
+then
+    cpptraj -i postrun2.in
+    if [ $? -eq 0 ]
+    then
+        echo -e "Subject: Run $SLURM_JOB_NAME finished in ClusterUY" | sendmail $email
+    else
+        echo -e "Subject: FAILED $SLURM_JOB_NAME postrun2" | sendmail $email
+    fi
+else
+    echo -e "Subject: FAILED $SLURM_JOB_NAME postrun1" | sendmail $email
+fi
