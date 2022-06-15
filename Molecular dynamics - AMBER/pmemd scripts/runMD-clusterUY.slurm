@@ -58,9 +58,12 @@ then
   last=false
   cp $SLURM_JOB_NAME.slurm $next.slurm
 
-  sed -r -i "s/^#SBATCH --job-name=.*/#SBATCH --job-name=$next/" $next.slurm
-  sed -r -i "s/^#*SBATCH --dependency=afterok:.*/#SBATCH --dependency=afterok:$SLURM_JOB_ID/" $next.slurm
-  sed -r -i "s/^ns_in=.*/ns_in=$ns_out/" $next.slurm
+  sed -r "s/^#SBATCH --job-name=.*/#SBATCH --job-name=$next/" $next.slurm > $next-1.slurm
+  sed -r "s/^#*SBATCH --dependency=afterok:.*/#SBATCH --dependency=afterok:$SLURM_JOB_ID/" $next-1.slurm > $next-2.slurm
+  sed -r "s/^ns_in=.*/ns_in=$ns_out/" $next-2.slurm > $next-3.slurm
+
+  rm $next.slurm $next-1.slurm $next-2.slurm
+  mv $next-3.slurm $next.slurm
 
   sbatch $next.slurm
 else
