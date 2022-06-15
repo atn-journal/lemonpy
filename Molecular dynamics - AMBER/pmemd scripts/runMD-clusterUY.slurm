@@ -20,12 +20,12 @@ ns_end=500
 coord=''
 temp=
 ID=''
-email='ariel.tijman@gmail.com'
 ####################################################################################
 ####################################################################################
 
 echo job_ID=$SLURM_JOB_ID
 hostname
+email=`grep -m 1 mail-user $SLURM_JOB_NAME.slurm | cut -d = -f2`
 
 # Load modules
 source /etc/profile.d/modules.sh
