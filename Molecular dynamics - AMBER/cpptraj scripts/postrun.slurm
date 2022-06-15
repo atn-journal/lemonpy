@@ -15,6 +15,7 @@
 prmtop=''
 temp=
 ns=
+strip='WAT,Na+,Cl-'
 #######################################################################
 #######################################################################
 
@@ -36,7 +37,7 @@ cat << EOF > postrun1.in
 parm ${prmtop}.prmtop
 trajin *md*ns-${temp}K.nc
 autoimage
-strip :WAT,Na+,Cl- parmout ${prmtop}-dry.prmtop
+strip :$strip parmout ${prmtop}-dry.prmtop
 trajout ${prmtop}-md${ns}ns-${temp}K-dry-c10ps.nc netcdf
 run
 EOF
