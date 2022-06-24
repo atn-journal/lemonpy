@@ -17,7 +17,7 @@ P = 1 bar and coupling = 0.2 ps.
     ntc=2,ntf=2,
     nscm=5000,
     cut=9.0,
-    ntpr=500,ntwr=125000,ntwx=500,
+    ntpr=500,ntwr=500,ntwx=500,
   /
 
 EOF
